@@ -44,9 +44,9 @@ const sounds = {};
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
 
-const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
-const scheduleAheadTime = 0.1; // How far ahead to schedule audio (in seconds)
-let nextNoteTime = 0.0; // When the next note is due
+const lookahead = 25.0;
+const scheduleAheadTime = 0.1;
+let nextNoteTime = 0.0;
 
 async function loadSound(url) {
     const response = await fetch(url);
