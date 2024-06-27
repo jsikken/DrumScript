@@ -26,6 +26,10 @@
             <button id="play">Play</button>
             <button id="pause">Pause</button>
             <button id="stop">Stop</button>
+            <button id="exportButton">Export</button>
+        	<a id="downloadLink" style="display: none;">Download</a>
+        	<input type="file" id="importInput" accept=".json">
+        	<button id="importButton">Import</button>
             <br><br>
         </div>
         <div class="drum-grid">
@@ -206,10 +210,7 @@
         <p>DrumScript © Joppe Sikken, 2024.</p>
         
     </div></footer>
-	<button id="exportButton">Export</button>
-	<a id="downloadLink" style="display: none;">Download</a>
-	<input type="file" id="importInput" accept=".json">
-	<button id="importButton">Import</button>
+	
     <script src="js/seqbeta.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
