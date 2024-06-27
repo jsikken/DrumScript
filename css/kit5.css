@@ -1,0 +1,193 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #FFBB00;
+    font-family: sans-serif;
+    opacity: 1;
+    background: linear-gradient(135deg, #a50000 25%, transparent 25%) -32px 0, linear-gradient(225deg, #a50000 25%, transparent 25%) -32px 0, linear-gradient(315deg, #a50000 25%, transparent 25%), linear-gradient(45deg, #a50000 25%, transparent 25%);
+    background-size: 64px 64px;
+    background-color: #333333;
+    overflow: hidden;
+    touch-action: none;
+}
+
+@font-face {
+    font-family: 'HELP';
+    src: url('../HELP.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.key {
+    border: 1px solid #ffffff;
+    padding: 20px;
+    margin: 10px;
+    display: inline-block;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    text-align: center;
+    width: 100px;
+    height: 100px;
+    box-shadow: 10px 10px 25px 0px rgba(0,0,0,0.45), 5px 5px 100px 0px rgb(167, 167, 167) inset;
+}
+
+.key.active {
+    transform: scale(1.1);
+    background-color: #797979;
+    color: #ffffff;
+}
+
+header {
+    background-color: #333333;
+    opacity: 1;
+    background-image:  radial-gradient(#FFBB00 0.5px, transparent 0.5px), radial-gradient(#FFBB00 0.5px, #333333 0.5px);
+    background-size: 20px 20px;
+    background-position:  17px 0, 17px 0, 0 0, 0 0;
+    background-repeat: repeat;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+    font-family: 'HELP', sans-serif;
+}
+header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+header h4 {
+  margin: 0;
+  font-size: 10px;
+}
+
+.header-link {
+    text-decoration: none; /* Verwijdert de onderstreping */
+    color: inherit; /* Neemt de kleur over van de ouder */
+    display: inline-block; /* Zorgt ervoor dat de link werkt als een block-level element */
+}
+footer {
+    background-color: #333333;
+    opacity: 1;
+    background-image:  radial-gradient(#FFBB00 0.5px, transparent 0.5px), radial-gradient(#FFBB00 0.5px, #333333 0.5px);
+    background-size: 20px 20px;
+    background-position: 0 0,10px 10px;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0px -5px 21px 0px rgba(0,0,0,0.35);
+}
+
+#drum-kit {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.mobile-menu {
+  position: relative;
+  left: 20px;
+}
+
+#menu-toggle {
+  display: none;
+}
+
+.menu-icon {
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.menu-items {
+  display: none;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  background:
+    linear-gradient(135deg,#0000 20.5%,#281c00 0 29.5%,#0000 0) 0 5px,
+    linear-gradient( 45deg,#0000 8%,#281c00 0 17%, #0000 0 58%) 10px 0,
+    linear-gradient(135deg,#0000 8%,#281c00 0 17%, #0000 0 58%,#281c00 0 67%,#0000 0),
+    linear-gradient( 45deg,#0000 8%,#281c00 0 17%, #0000 0 58%,#281c00 0 67%,#0000 0 83%,#281c00 0 92%,#0000 0),
+    #000000;
+  background-size: 20px 20px;
+  color: #FFBB00;
+  box-shadow: inset 0px -5px 5px 0px rgba(0,0,0,0.75), 0px -5px 5px 0px rgba(0,0,0,0.35);
+}
+
+#menu-toggle:checked ~ .menu-items {
+  display: block;
+}
+
+.menu-items li {
+  padding: 10px;
+}
+
+.menu-items a {
+  text-decoration: none;
+  color: #cf9800;
+}
+
+#drum-kit2 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end; /* Plaatst de inhoud naar rechts */
+    align-items: flex-start; /* Plaatst de inhoud naar boven */
+    position: fixed; /* Maakt positionering ten opzichte van het scherm mogelijk */
+    top: 80px; /* Zorg ervoor dat het onder de header blijft */
+    right: 45; /* Positioneert het element aan de rechterkant */
+    padding: 10px; /* Optioneel, voegt wat padding toe rond het element */
+    z-index: 2; /* Zorg ervoor dat het boven andere inhoud blijft behalve de header */
+}
+
+.container {
+    text-align: center; /* Zorgt ervoor dat inline-block elementen gecentreerd worden */
+}
+.button {
+    display: inline-block; /* Verandert de knop in een inline-blok element */
+    height: 30px;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 600px) {
+    #drum-kit {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+.mobile-menu {
+    display: block;
+    position: static;
+    margin-bottom: 10px;
+  }
+    
+    #drum-kit2 {
+        flex-direction: column; /* Stapel de items onder elkaar */
+        justify-content: flex-start; /* Plaatst de inhoud naar boven */
+        align-items: flex-end; /* Plaatst de inhoud naar rechts */
+        top: 80px; /* Voeg wat extra ruimte bovenaan toe voor mobiel */
+        right: 45px; /* Voeg wat ruimte aan de rechterkant toe voor mobiel */
+    }
+
+    .key {
+        width: 60px;
+        height: 60px;
+        padding: 10px;
+        margin: 5px;
+        font-size: 12px;
+    }
+}
