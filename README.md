@@ -12,7 +12,7 @@ DrumScript is a web-based drum computer designed for creating drum patterns and 
 
 ## Getting Started
 
-To use DrumScript, simply visit the [DrumScript web application](https://jsikken.github.io/DrumScript/). 
+To use DrumScript, simply visit the [DrumScript web application](https://jsikken.github.io/drumscriptstructured/). 
 ### No installation is required.
 
 ## To do
