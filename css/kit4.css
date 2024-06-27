@@ -19,6 +19,10 @@ body {
     touch-action: none;
 }
 
+b {
+    color: #a50000;
+}
+
 @font-face {
     font-family: 'HELP';
     src: url('../HELP.ttf') format('truetype');
