@@ -148,18 +148,18 @@ function nextNote() {
     if (currentStep === 8) {
         currentStep = 0;
     }
-    return secondsPerBeat / 2;
+    return audioCtx.currentTime + secondsPerBeat / 2;
 }
-
-let nextNoteTime = 0;
 
 function scheduler() {
     while (nextNoteTime < audioCtx.currentTime + 0.1) {
         scheduleNote(currentStep, nextNoteTime);
-        nextNoteTime += nextNote();
+        nextNoteTime = nextNote();
     }
-    schedulerTimerId = setTimeout(scheduler, 25);
+    schedulerTimerId = requestAnimationFrame(scheduler);
 }
+
+let nextNoteTime = 0;
 
 function startSequencer() {
     if (!isPlaying) {
@@ -181,7 +181,7 @@ function startSequencer() {
 function pauseSequencer() {
     if (isPlaying) {
         isPlaying = false;
-        clearTimeout(schedulerTimerId);
+        cancelAnimationFrame(schedulerTimerId);
     }
 }
 
