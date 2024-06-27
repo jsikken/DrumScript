@@ -2,7 +2,7 @@
   "name": "DrumScript",
   "short_name": "DrumScript",
   "description": "Drum Machine",
-  "start_url": "/drumscriptstructured/splash.html",
+  "start_url": "/drumscript/splash.html",
   "display": "standalone",
   "background_color": "#333333",
   "theme_color": "#333333",
