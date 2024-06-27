@@ -28,6 +28,10 @@ body {
   font-style: normal;
 }
 
+b {
+    color: #a50000;
+}
+
 header {
   background-color: #333333;
   background-image: radial-gradient(#FFBB00 0.5px, transparent 0.5px), radial-gradient(#FFBB00 0.5px, #333333 0.5px);
