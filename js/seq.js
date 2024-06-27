@@ -14,7 +14,6 @@ const soundFiles = {
     '13': 'dummy.m4a'  // Dummy file
 };
 
-// Define hardcoded volumes for each sound file
 const soundVolumes = {
     '1': 0.8,
     '2': 0.7,
@@ -45,6 +44,10 @@ const sounds = {};
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
 
+const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
+const scheduleAheadTime = 0.1; // How far ahead to schedule audio (in seconds)
+let nextNoteTime = 0.0; // When the next note is due
+
 async function loadSound(url) {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
@@ -67,7 +70,6 @@ loadButton.addEventListener('click', () => {
         loadButton.style.display = 'none';
         document.getElementById('play').style.display = 'inline-block';
     }
-    
 });
 
 async function loadSounds() {
@@ -101,12 +103,11 @@ function playDummySound() {
     }
 }
 
-// Hihat choking logic
 let activeHihatOpenSource = null;
 
-function playSoundByKey(key) {
+function playSoundByKey(key, time) {
     if (key === '3' && activeHihatOpenSource) {
-        activeHihatOpenSource.stop();
+        activeHihatOpenSource.stop(time);
         activeHihatOpenSource = null;
     }
 
@@ -118,12 +119,12 @@ function playSoundByKey(key) {
 
     if (key === '4') {
         if (activeHihatOpenSource) {
-            activeHihatOpenSource.stop();
+            activeHihatOpenSource.stop(time);
         }
         activeHihatOpenSource = source;
     }
 
-    source.start();
+    source.start(time);
 }
 
 function scheduleNote(stepIndex, time) {
@@ -144,22 +145,20 @@ function scheduleNote(stepIndex, time) {
 
 function nextNote() {
     const secondsPerBeat = 60.0 / bpmInput.value;
+    nextNoteTime += 0.5 * secondsPerBeat; // Add half a beat
     currentStep++;
     if (currentStep === 8) {
         currentStep = 0;
     }
-    return audioCtx.currentTime + secondsPerBeat / 2;
 }
 
 function scheduler() {
-    while (nextNoteTime < audioCtx.currentTime + 0.1) {
+    while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
         scheduleNote(currentStep, nextNoteTime);
-        nextNoteTime = nextNote();
+        nextNote();
     }
-    schedulerTimerId = requestAnimationFrame(scheduler);
+    schedulerTimerId = setTimeout(scheduler, lookahead);
 }
-
-let nextNoteTime = 0;
 
 function startSequencer() {
     if (!isPlaying) {
@@ -172,26 +171,19 @@ function startSequencer() {
         currentStep = 0;
         nextNoteTime = audioCtx.currentTime;
         scheduler();
-        // Verberg Play knop en toon Stop knop
         document.getElementById('play').style.display = 'none';
         document.getElementById('stop').style.display = 'inline-block';
     }
 }
 
-function pauseSequencer() {
+function stopSequencer() {
     if (isPlaying) {
         isPlaying = false;
-        cancelAnimationFrame(schedulerTimerId);
+        clearTimeout(schedulerTimerId);
+        stepIndicators.forEach(indicator => indicator.classList.remove('active'));
+        document.getElementById('play').style.display = 'inline-block';
+        document.getElementById('stop').style.display = 'none';
     }
-}
-
-function stopSequencer() {
-    pauseSequencer();
-    currentStep = 0;
-    stepIndicators.forEach(indicator => indicator.classList.remove('active'));
-    // Toon Play knop en verberg Stop knop
-    document.getElementById('play').style.display = 'inline-block';
-    document.getElementById('stop').style.display = 'none';
 }
 
 document.getElementById('play').addEventListener('click', startSequencer);
@@ -205,10 +197,12 @@ steps.forEach(step => {
 
 bpmInput.addEventListener('input', () => {
     if (isPlaying) {
-        pauseSequencer();
+        clearTimeout(schedulerTimerId);
         startSequencer();
     }
 });
+
+
 
 // Functie om het patroon te exporteren naar een JSON-bestand
 function exportPattern() {
