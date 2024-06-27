@@ -65,7 +65,7 @@ Object.keys(soundFiles).forEach(key => {
 
 // Extra GainNode voor de snare (case '2')
 const snareExtraGainNode = audioContext.createGain();
-snareExtraGainNode.gain.value = 1.2; // 120% volume
+snareExtraGainNode.gain.value = 0.2;
 
 // Verbind de snare met de extra GainNode
 gainNodes['2'].connect(snareExtraGainNode);
