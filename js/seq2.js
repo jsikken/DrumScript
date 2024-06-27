@@ -1,12 +1,12 @@
 const soundFiles = {
     '1': './kit5/kd.wav',
-    '1': './kit5/sd.wav',
+    '2': './kit5/sd.wav',
     '3': './kit5/hhc.wav',
     '4': './kit5/hho.wav',
     '5': './kit5/t1.wav',
     '6': './kit5/t2.wav',
     '7': './kit5/crash.wav',
-    '8': './kit5/ride.wav'
+    '8': './kit5/ride.wav',
     '9': './kit5/clap.wav',
     '10': './kit1/china.m4a',
     '11': './kit1/gunshotwav.m4a',
