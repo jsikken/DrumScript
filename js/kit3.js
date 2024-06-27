@@ -6,15 +6,15 @@ const loadedBuffers = {};
 const gainNodes = {};
 
 const soundFiles = {
-    '1': '../kit3/kd.m4a',
-    '2': '../kit3/sd.m4a', 
-    '3': '../kit3/hhc.m4a',
-    '4': '../kit3/hho.m4a',
-    '5': '../kit3/t1.m4a',
-    '6': '../kit3/t2.m4a',
-    '7': '../kit3/crash.m4a',
-    '8': '../kit3/ride.m4a',
-    '9': '../kit3/china.m4a'
+    '1': './kit3/kd.m4a',
+    '2': './kit3/sd.m4a', 
+    '3': './kit3/hhc.m4a',
+    '4': './kit3/hho.m4a',
+    '5': './kit3/t1.m4a',
+    '6': './kit3/t2.m4a',
+    '7': './kit3/crash.m4a',
+    '8': './kit3/ride.m4a',
+    '9': './kit3/china.m4a'
 };
 
 // Laad alle geluidsbestanden vooraf

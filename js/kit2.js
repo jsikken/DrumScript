@@ -6,15 +6,15 @@ const loadedBuffers = {};
 const gainNodes = {};
 
 const soundFiles = {
-    '1': '../kit2/kd.wav',
-    '2': '../kit2/sd.wav', 
-    '3': '../kit2/hhc.wav',
-    '4': '../kit2/hho.wav',
-    '5': '../kit2/t1.wav',
-    '6': '../kit2/t3.wav',
-    '7': '../kit2/crash.wav',
-    '8': '../kit2/revcrash.wav',
-    '9': '../kit2/cowbell.wav'
+    '1': './kit2/kd.wav',
+    '2': './kit2/sd.wav', 
+    '3': './kit2/hhc.wav',
+    '4': './kit2/hho.wav',
+    '5': './kit2/t1.wav',
+    '6': './kit2/t3.wav',
+    '7': './kit2/crash.wav',
+    '8': './kit2/revcrash.wav',
+    '9': './kit2/cowbell.wav'
 };
 
 // Laad alle geluidsbestanden vooraf

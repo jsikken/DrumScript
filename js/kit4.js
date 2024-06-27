@@ -6,15 +6,15 @@ const loadedBuffers = {};
 const gainNodes = {};
 
 const soundFiles = {
-    '1': '../kit4/kd.wav',
-    '2': '../kit4/sd.wav', 
-    '3': '../kit4/hhc.wav',
-    '4': '../kit4/hho.wav',
-    '5': '../kit4/t1.wav',
-    '6': '../kit4/t2.wav',
-    '7': '../kit4/crash.wav',
-    '8': '../kit4/clap.wav',
-    '9': '../kit4/fx.wav'
+    '1': './kit4/kd.wav',
+    '2': './kit4/sd.wav', 
+    '3': './kit4/hhc.wav',
+    '4': './kit4/hho.wav',
+    '5': './kit4/t1.wav',
+    '6': './kit4/t2.wav',
+    '7': './kit4/crash.wav',
+    '8': './kit4/clap.wav',
+    '9': './kit4/fx.wav'
 };
 
 // Laad alle geluidsbestanden vooraf
