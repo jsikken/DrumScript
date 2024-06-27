@@ -209,3 +209,64 @@ bpmInput.addEventListener('input', () => {
         startSequencer();
     }
 });
+
+// Functie om het patroon te exporteren naar een JSON-bestand
+function exportPattern() {
+    const pattern = [];
+
+    steps.forEach(step => {
+        if (step.classList.contains('active')) {
+            pattern.push({
+                step: step.dataset.step,
+                sound: step.closest('.drum-row').dataset.sound
+            });
+        }
+    });
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pattern));
+    const downloadAnchorNode = document.getElementById('downloadLink');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "pattern.json");
+    downloadAnchorNode.click();
+}
+
+document.getElementById('exportButton').addEventListener('click', exportPattern);
+
+// Functie om een JSON-bestand in te lezen
+function readJSONFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(JSON.parse(event.target.result));
+        reader.onerror = (error) => reject(error);
+        reader.readAsText(file);
+    });
+}
+
+// Functie om het patroon te importeren vanuit een JSON-bestand
+async function importPattern(event) {
+    const file = document.getElementById('importInput').files[0];
+    if (!file) {
+        alert("Please select a file to import.");
+        return;
+    }
+
+    try {
+        const pattern = await readJSONFile(file);
+
+        // Reset alle actieve stappen
+        steps.forEach(step => step.classList.remove('active'));
+
+        // Stel de nieuwe stappen in
+        pattern.forEach(item => {
+            const step = document.querySelector(`.drum-row[data-sound="${item.sound}"] .grid-cell[data-step="${item.step}"]`);
+            if (step) {
+                step.classList.add('active');
+            }
+        });
+    } catch (error) {
+        console.error("Error reading the file:", error);
+        alert("Failed to import the pattern.");
+    }
+}
+
+document.getElementById('importButton').addEventListener('click', importPattern);
