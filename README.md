@@ -16,5 +16,4 @@ To use DrumScript, simply visit the [DrumScript web application](https://jsikken
 ### No installation is required.
 
 ## To do
-- Organize everything. It's a (fully functional) mess right now.
 - Implement an audio recorder.
