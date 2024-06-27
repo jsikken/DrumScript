@@ -27,7 +27,7 @@ const soundVolumes = {
     '10': 0.8,
     '11': 0.6,
     '12': 0.8,
-    '13': 0.1  // Dummy file volume set to 0
+    '13': 0.1  // Dummy file volume op 0
 };
 
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
@@ -44,9 +44,9 @@ const sounds = {};
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
 
-const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
-const scheduleAheadTime = 0.1; // How far ahead to schedule audio (in seconds)
-let nextNoteTime = 0.0; // When the next note is due
+const lookahead = 25.0;
+const scheduleAheadTime = 0.1;
+let nextNoteTime = 0.0;
 
 async function loadSound(url) {
     const response = await fetch(url);
