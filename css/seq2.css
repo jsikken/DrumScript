@@ -136,6 +136,16 @@ footer {
     margin-bottom: 20px;
 }
 
+.controls2 {
+    display: flex;
+    flex-wrap: wrap; /* Zorgt ervoor dat knoppen worden gewrapt op kleinere schermen */
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-direction: column;
+}
+
 .controls button,
 .controls input {
     display: flex;
