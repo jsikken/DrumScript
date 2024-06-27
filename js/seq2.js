@@ -14,7 +14,6 @@ const soundFiles = {
     '13': 'dummy.m4a'  // Dummy file
 };
 
-// Define hardcoded volumes for each sound file
 const soundVolumes = {
     '1': 0.8,
     '2': 0.7,
@@ -40,7 +39,7 @@ let isPlaying = false;
 let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
 const steps = document.querySelectorAll('.grid-cell');
-const stepIndicators = document.querySelectorAll('.step');
+const stepIndicators = document.querySelectorAll('.step-indicator');
 const sounds = {};
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
@@ -104,7 +103,7 @@ function playDummySound() {
 // Hihat choking logic
 let activeHihatOpenSource = null;
 
-function playSoundByKey(key) {
+function playSoundByKey(key, time) {
     if (key === '3' && activeHihatOpenSource) {
         activeHihatOpenSource.stop();
         activeHihatOpenSource = null;
@@ -123,7 +122,7 @@ function playSoundByKey(key) {
         activeHihatOpenSource = source;
     }
 
-    source.start();
+    source.start(time);
 }
 
 function scheduleNote(stepIndex, time) {
@@ -172,7 +171,6 @@ function startSequencer() {
         currentStep = 0;
         nextNoteTime = audioCtx.currentTime;
         scheduler();
-        // Verberg Play knop en toon Stop knop
         document.getElementById('play').style.display = 'none';
         document.getElementById('stop').style.display = 'inline-block';
     }
@@ -189,7 +187,6 @@ function stopSequencer() {
     pauseSequencer();
     currentStep = 0;
     stepIndicators.forEach(indicator => indicator.classList.remove('active'));
-    // Toon Play knop en verberg Stop knop
     document.getElementById('play').style.display = 'inline-block';
     document.getElementById('stop').style.display = 'none';
 }
