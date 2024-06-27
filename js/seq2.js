@@ -39,7 +39,7 @@ let isPlaying = false;
 let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
 const steps = document.querySelectorAll('.grid-cell');
-const stepIndicators = document.querySelectorAll('.step-indicator');
+const stepIndicators = document.querySelectorAll('.step');
 const sounds = {};
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
@@ -103,7 +103,7 @@ function playDummySound() {
 // Hihat choking logic
 let activeHihatOpenSource = null;
 
-function playSoundByKey(key, time) {
+function playSoundByKey(key) {
     if (key === '3' && activeHihatOpenSource) {
         activeHihatOpenSource.stop();
         activeHihatOpenSource = null;
@@ -122,7 +122,7 @@ function playSoundByKey(key, time) {
         activeHihatOpenSource = source;
     }
 
-    source.start(time);
+    source.start();
 }
 
 function scheduleNote(stepIndex, time) {
@@ -147,18 +147,18 @@ function nextNote() {
     if (currentStep === 8) {
         currentStep = 0;
     }
-    return secondsPerBeat / 2;
+    return audioCtx.currentTime + secondsPerBeat / 2;
 }
-
-let nextNoteTime = 0;
 
 function scheduler() {
     while (nextNoteTime < audioCtx.currentTime + 0.1) {
         scheduleNote(currentStep, nextNoteTime);
-        nextNoteTime += nextNote();
+        nextNoteTime = nextNote();
     }
-    schedulerTimerId = setTimeout(scheduler, 25);
+    schedulerTimerId = requestAnimationFrame(scheduler);
 }
+
+let nextNoteTime = 0;
 
 function startSequencer() {
     if (!isPlaying) {
@@ -171,6 +171,7 @@ function startSequencer() {
         currentStep = 0;
         nextNoteTime = audioCtx.currentTime;
         scheduler();
+        // Verberg Play knop en toon Stop knop
         document.getElementById('play').style.display = 'none';
         document.getElementById('stop').style.display = 'inline-block';
     }
@@ -179,7 +180,7 @@ function startSequencer() {
 function pauseSequencer() {
     if (isPlaying) {
         isPlaying = false;
-        clearTimeout(schedulerTimerId);
+        cancelAnimationFrame(schedulerTimerId);
     }
 }
 
@@ -187,6 +188,7 @@ function stopSequencer() {
     pauseSequencer();
     currentStep = 0;
     stepIndicators.forEach(indicator => indicator.classList.remove('active'));
+    // Toon Play knop en verberg Stop knop
     document.getElementById('play').style.display = 'inline-block';
     document.getElementById('stop').style.display = 'none';
 }
