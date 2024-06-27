@@ -22,6 +22,10 @@ body {
     font-style: normal;
 }
 
+b {
+    color: #a50000;
+}
+
 .key {
     border: 1px solid #ff00cc;
     padding: 20px;
