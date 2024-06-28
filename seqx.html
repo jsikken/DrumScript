@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DrumScript</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/seq.css">
+</head>
+<body>
+    <div class="container">
+        <div class="step-indicators">
+            <div class="step">1</div>
+            <div class="step">2</div>
+            <div class="step">3</div>
+            <div class="step">4</div>
+            <div class="step">5</div>
+            <div class="step">6</div>
+            <div class="step">7</div>
+            <div class="step">8</div>
+        </div>
+        <div class="controls">
+            <span class="bpm-label">BPM:</span>
+            <input type="number" id="bpm" value="120" min="60" max="200">
+            <button id="loadButton">Load 3</button>
+            <button id="play">Play</button>
+            <button id="pause">Pause</button>
+            <button id="stop">Stop</button>
+            <button id="exportButton">Export</button>
+            <button id="importButton">Import</button>
+        </div>
+        <div class="controls2">
+        	<a id="downloadLink" style="display: none;">Download</a>
+        	<input type="file" id="importInput" accept=".json">
+        </div>
+        <div class="drum-grid">
+            <div class="drum-row" data-sound="1">
+                <span>Kick</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="2">
+                <span>Snare</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="3">
+                <span>Closed HiHat</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="4">
+                <span>Open HiHat</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="5">
+                <span>Tom 1</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="6">
+                <span>Tom 2</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="7">
+                <span>Crash</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="8">
+                <span>Ride</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="9">
+                <span>Clap</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="10">
+                <span>China</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="12">
+                <span>Stick</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+            <div class="drum-row" data-sound="11">
+                <span>FX</span>
+                <div class="steps">
+                    <button class="grid-cell" data-step="1"></button>
+                    <button class="grid-cell" data-step="2"></button>
+                    <button class="grid-cell" data-step="3"></button>
+                    <button class="grid-cell" data-step="4"></button>
+                    <button class="grid-cell" data-step="5"></button>
+                    <button class="grid-cell" data-step="6"></button>
+                    <button class="grid-cell" data-step="7"></button>
+                    <button class="grid-cell" data-step="8"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer><div class="footercontainer">
+        <nav class="mobile-menu">
+            <input type="checkbox" id="menu-toggle">
+            <label for="menu-toggle" class="menu-icon">&#9776;</label>
+            <ul class="menu-items">
+                <br>
+                <div class="swing-control">
+                    <label for="swing">Swing:</label>
+                    <input type="range" id="swing" min="0" max="100" value="0">
+                </div>
+                <p>---------------</p>
+                <li><a href="#" onclick="selectSoundKit('kit1')">seq kit 1</a></li>
+                <li><a href="#" onclick="selectSoundKit('kit2')">seq kit 2</a></li>
+                <p>---------------</p>
+                <li><a href="seq.html">refresh</a></li>
+                <li><a href="kit5.html">kit 5</a></li>
+                <li><a href="kit4.html">kit 4</a></li>
+                <li><a href="kit3.html">kit 3</a></li>
+                <li><a href="kit2.html">kit 2</a></li>
+                <li><a href="index.html">kit 1</a></li>
+                <li><a href="seq.html"><b>seq</b></a></li>
+              </ul>
+          </nav>
+        <p>DrumScript © Joppe Sikken, 2024.</p>
+        
+    </div></footer>
+	
+    <script src="js/seqx.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+            .then(function(registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(function(error) {
+                console.log('Service Worker registration failed:', error);
+            });
+        }
+    </script>
+    <script>
+        function addToHomeScreen() {
+          // Controleer of het apparaat iOS is en niet in standalone modus
+          if ('navigator' in window && 'standalone' in window.navigator && !window.navigator.standalone) {
+            alert('Druk op het deel-icoon en selecteer "Zet op beginscherm".');
+          } 
+          // Controleer of het apparaat Android is en in browser modus
+          else if ('matchMedia' in window && window.matchMedia('(display-mode: browser)').matches) {
+            alert('Druk op het menu-icoon en selecteer "Toevoegen aan startscherm".');
+          } 
+          // Als het apparaat geen ondersteuning heeft
+          else {
+            alert('Uw apparaat ondersteunt deze functie niet.');
+          }
+        }
+     </script>
+    
+</body>
+</html>
