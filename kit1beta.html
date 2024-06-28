@@ -126,6 +126,9 @@
             drumPads.forEach(function(pad) {
                 pad.addEventListener('click', playSound);
             });
+
+            // Voeg event listeners toe voor toetsenbordgebeurtenissen
+            window.addEventListener('keydown', handleKeydown);
         }
 
         function updateUIElements() {
@@ -144,6 +147,21 @@
                 audio.play();
             }
         }
+
+        function handleKeydown(event) {
+            // Implementeer hier de logica om het geluid af te spelen bij toetsenbordgebeurtenissen
+            var key = document.querySelector(`.key[data-key="${event.keyCode}"]`);
+            if (key) {
+                var audio = key.querySelector('audio');
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play();
+                }
+            }
+        }
+
+        // Initialiseer de drumkit bij het laden van de pagina
+        window.addEventListener('load', initializeDrumKit);
     </script>
 </body>
 </html>
