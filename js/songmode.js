@@ -1,16 +1,3 @@
-let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-    latencyHint: 'interactive'
-});
-
-let currentStep = 0;
-let isPlaying = false;
-let schedulerTimerId;
-let nextNoteTime = 0;
-
-const bpmInput = document.getElementById('bpm');
-const stepIndicators = document.querySelectorAll('.step');
-const sounds = {};
-
 const soundFiles = {
     '1': 'kickwav.m4a',
     '2': 'snarewav.m4a',
@@ -23,9 +10,10 @@ const soundFiles = {
     '9': 'clapwav.m4a',
     '10': 'china.m4a',
     '11': 'gunshotwav.m4a',
-    '12': 'dummy.m4a'  // Dummy file
+    '12': 'dummy.m4a'
 };
 
+// Define hardcoded volumes for each sound file
 const soundVolumes = {
     '1': 0.8,
     '2': 0.7,
@@ -38,14 +26,47 @@ const soundVolumes = {
     '9': 0.7,
     '10': 0.8,
     '11': 0.6,
-    '12': 0.1  // Dummy file volume set to 0
+    '12': 0.1
 };
+
+let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+    latencyHint: 'interactive'
+});
+
+let currentStep = 0;
+let isPlaying = false;
+let schedulerTimerId;
+const bpmInput = document.getElementById('bpm');
+const steps = document.querySelectorAll('.grid-cell');
+const stepIndicators = document.querySelectorAll('.step');
+const sounds = {};
+let loadButton = document.getElementById('loadButton');
+let clickCount = 0;
 
 async function loadSound(url) {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     return audioCtx.decodeAudioData(arrayBuffer);
 }
+
+loadButton.addEventListener('click', () => {
+    clickCount++;
+    
+    if (clickCount === 1 || clickCount === 2 || clickCount === 3) {
+        loadSounds();
+        playDummySound();
+    }
+    
+    if (clickCount < 3) {
+        loadButton.textContent = `Load ${3 - clickCount}`;
+    } else if (clickCount === 3) {
+        loadButton.textContent = 'Done';
+        loadButton.disabled = true;
+        loadButton.style.display = 'none';
+        document.getElementById('play').style.display = 'inline-block';
+        document.getElementById('rec').style.display = 'inline-block';
+    }
+});
 
 async function loadSounds() {
     try {
@@ -67,6 +88,15 @@ function playSound(buffer, time, volume) {
     gainNode.gain.value = volume;
     source.connect(gainNode).connect(audioCtx.destination);
     source.start(time);
+}
+
+function playDummySound() {
+    if (sounds['12']) {
+        const volume = soundVolumes['12'];
+        playSound(sounds['12'], audioCtx.currentTime, volume);
+    } else {
+        console.error('Dummy sound not found');
+    }
 }
 
 // Hihat choking logic
@@ -98,7 +128,6 @@ function scheduleNote(stepIndex, time) {
     stepIndicators.forEach(indicator => indicator.classList.remove('active'));
     stepIndicators[stepIndex].classList.add('active');
 
-    const steps = document.querySelectorAll('.grid-cell');
     steps.forEach(step => {
         if (step.dataset.step == stepIndex + 1 && step.classList.contains('active')) {
             const soundKey = step.closest('.drum-row').dataset.sound;
@@ -128,7 +157,9 @@ function scheduler() {
     schedulerTimerId = requestAnimationFrame(scheduler);
 }
 
-function startPlayback() {
+let nextNoteTime = 0;
+
+function startPlaying() {
     if (!isPlaying) {
         if (audioCtx.state === 'suspended') {
             audioCtx.resume().then(() => {
@@ -139,53 +170,71 @@ function startPlayback() {
         currentStep = 0;
         nextNoteTime = audioCtx.currentTime;
         scheduler();
-        document.getElementById('play').textContent = 'Stop';
+        document.getElementById('play').style.display = 'none';
+        document.getElementById('stop').style.display = 'inline-block';
     }
 }
 
-function stopPlayback() {
+function stopPlaying() {
     if (isPlaying) {
         isPlaying = false;
         cancelAnimationFrame(schedulerTimerId);
         currentStep = 0;
         stepIndicators.forEach(indicator => indicator.classList.remove('active'));
-        document.getElementById('play').textContent = 'Play';
+        document.getElementById('play').style.display = 'inline-block';
+        document.getElementById('stop').style.display = 'none';
     }
 }
 
-document.getElementById('play').addEventListener('click', () => {
-    if (!isPlaying) {
-        startPlayback();
-    } else {
-        stopPlayback();
-    }
-});
+// Function to handle pattern import
+function handlePatternImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-document.getElementById('bpm').addEventListener('input', () => {
-    if (isPlaying) {
-        stopPlayback();
-        startPlayback();
-    }
-});
-
-async function loadPattern(fileInput, patternId) {
-    const file = fileInput.files[0];
     const reader = new FileReader();
-    reader.onload = function(event) {
-        const pattern = JSON.parse(event.target.result);
-        document.getElementById(`pattern${patternId}`).innerText = JSON.stringify(pattern);
-        // Load pattern into sequencer
-        // This is a placeholder. The actual implementation depends on the structure of your sequencer.
-        console.log(`Pattern ${patternId} loaded:`, pattern);
+    reader.onload = function(e) {
+        const contents = e.target.result;
+        const pattern = JSON.parse(contents);
+        loadPattern(pattern);
     };
     reader.readAsText(file);
 }
 
-document.getElementById('importInput1').addEventListener('change', (e) => loadPattern(e.target, 1));
-document.getElementById('importInput2').addEventListener('change', (e) => loadPattern(e.target, 2));
-document.getElementById('importInput3').addEventListener('change', (e) => loadPattern(e.target, 3));
-document.getElementById('importInput4').addEventListener('change', (e) => loadPattern(e.target, 4));
-document.getElementById('importInput5').addEventListener('change', (e) => loadPattern(e.target, 5));
-document.getElementById('importInput6').addEventListener('change', (e) => loadPattern(e.target, 6));
-document.getElementById('importInput7').addEventListener('change', (e) => loadPattern(e.target, 7));
-document.getElementById('importInput8').addEventListener('change', (e) => loadPattern(e.target, 8));
+function loadPattern(pattern) {
+    steps.forEach(step => step.classList.remove('active'));
+    pattern.forEach((row, rowIndex) => {
+        row.forEach((cell, cellIndex) => {
+            if (cell) {
+                const step = document.querySelector(`.drum-row[data-row="${rowIndex}"] .grid-cell[data-step="${cellIndex + 1}"]`);
+                step.classList.add('active');
+            }
+        });
+    });
+}
+
+// Event listeners for import inputs
+document.getElementById('importInput1').addEventListener('change', handlePatternImport);
+document.getElementById('importInput2').addEventListener('change', handlePatternImport);
+document.getElementById('importInput3').addEventListener('change', handlePatternImport);
+document.getElementById('importInput4').addEventListener('change', handlePatternImport);
+document.getElementById('importInput5').addEventListener('change', handlePatternImport);
+document.getElementById('importInput6').addEventListener('change', handlePatternImport);
+document.getElementById('importInput7').addEventListener('change', handlePatternImport);
+document.getElementById('importInput8').addEventListener('change', handlePatternImport);
+
+// Event listeners for the buttons
+document.getElementById('play').addEventListener('click', startPlaying);
+document.getElementById('stop').addEventListener('click', stopPlaying);
+
+steps.forEach(step => {
+    step.addEventListener('click', () => {
+        step.classList.toggle('active');
+    });
+});
+
+bpmInput.addEventListener('input', () => {
+    if (isPlaying) {
+        stopPlaying();
+        startPlaying();
+    }
+});
