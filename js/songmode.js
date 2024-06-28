@@ -89,6 +89,7 @@ function playSound(buffer, time, volume) {
     gainNode.gain.value = volume;
     source.connect(gainNode).connect(audioCtx.destination);
     source.start(time);
+    console.log(`Playing sound at time ${time}, volume ${volume}`);
 }
 
 function playDummySound() {
@@ -123,6 +124,7 @@ function playSoundByKey(key, time) {
     }
 
     source.start(time);
+    console.log(`Playing sound ${key} at time ${time}, volume ${gainNode.gain.value}`);
 }
 
 function scheduleNote(stepIndex, time) {
@@ -173,6 +175,7 @@ function startPlaying() {
         scheduler();
         document.getElementById('play').style.display = 'none';
         document.getElementById('stop').style.display = 'inline-block';
+        console.log('Playback started');
     }
 }
 
@@ -184,6 +187,7 @@ function stopPlaying() {
         stepIndicators.forEach(indicator => indicator.classList.remove('active'));
         document.getElementById('play').style.display = 'inline-block';
         document.getElementById('stop').style.display = 'none';
+        console.log('Playback stopped');
     }
 }
 
