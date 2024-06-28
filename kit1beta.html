@@ -88,26 +88,12 @@
         alert('Uw apparaat ondersteunt deze functie niet.');
       }
     }
-  </script>
-    <script>
-        function checkOrientation() {
-            if (window.innerHeight < window.innerWidth) {
-                document.getElementById('landscape-warning').style.display = 'flex';
-                document.getElementById('content').style.display = 'none';
-            } else {
-                document.getElementById('landscape-warning').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            }
-        }
-
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('load', checkOrientation);
-    </script>
-    <script>
-        function chooseKit(scriptSrc) {
-          var scriptElement = document.getElementById('kit-script');
-          scriptElement.src = scriptSrc;
-        }
-      </script>
+</script>
+<script>
+    function chooseKit(scriptSrc) {
+    var scriptElement = document.getElementById('kit-script');
+    scriptElement.src = scriptSrc;
+    }
+</script>
 </body>
 </html>
