@@ -143,7 +143,11 @@ function scheduleNoteForPattern(pattern, stepIndex, time) {
 
 function nextNote() {
     const secondsPerBeat = 60.0 / parseFloat(bpmInput.value);
-    nextNoteTime += 0.25 * secondsPerBeat;
+    let swingOffset = 0;
+    if (currentStep % 2 !== 0 && swingAmount > 0) {
+        swingOffset = (Math.random() - 0.5) * swingAmount * 0.5 * secondsPerBeat;
+    }
+    nextNoteTime += 0.25 * secondsPerBeat + swingOffset;
 
     currentStep++;
     if (currentStep === 32) {
