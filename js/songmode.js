@@ -11,7 +11,7 @@ const soundFiles = {
     '10': './kit1/china.m4a',
     '11': './kit1/gunshotwav.m4a',
     '12': './kit1/stick.m4a',
-    '13': 'dummy.m4a'  // Dummy file
+    '13': './dummy.m4a'  // Adjusted dummy file path
 };
 
 const soundVolumes = {
@@ -36,7 +36,6 @@ let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
 
 let currentStep = 0;
 let isPlaying = false;
-let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
 const swingInput = document.getElementById('swing');
 const steps = document.querySelectorAll('.grid-cell');
@@ -67,17 +66,21 @@ loadButton.addEventListener('click', () => {
         loadButton.disabled = true;
         loadButton.style.display = 'none';
         document.getElementById('play').style.display = 'inline-block';
-        document.getElementById('rec').style.display = 'inline-block';
+        document.getElementById('pause').style.display = 'inline-block'; // added display for pause button
+        document.getElementById('stop').style.display = 'inline-block';
     }
 });
 
 async function loadSounds() {
     try {
+        const promises = [];
         for (let key in soundFiles) {
-            const buffer = await loadSound(soundFiles[key]);
-            sounds[key] = buffer;
-            console.log(`Sound ${key} loaded successfully`);
+            promises.push(loadSound(soundFiles[key]).then(buffer => {
+                sounds[key] = buffer;
+                console.log(`Sound ${key} loaded successfully`);
+            }));
         }
+        await Promise.all(promises);
         console.log('All sounds loaded');
     } catch (error) {
         console.error('Error loading sounds:', error);
@@ -173,6 +176,7 @@ function startPlaying() {
         currentStep = 0;
         scheduler();
         document.getElementById('play').style.display = 'none';
+        document.getElementById('pause').style.display = 'inline-block';
         document.getElementById('stop').style.display = 'inline-block';
         console.log('Playback started');
     }
@@ -183,6 +187,7 @@ function stopPlaying() {
         isPlaying = false;
         stepIndicators.forEach(indicator => indicator.classList.remove('active'));
         document.getElementById('play').style.display = 'inline-block';
+        document.getElementById('pause').style.display = 'none';
         document.getElementById('stop').style.display = 'none';
         console.log('Playback stopped');
     }
@@ -225,6 +230,7 @@ document.getElementById('importInput').addEventListener('change', handlePatternI
 
 // Event listeners for the buttons
 document.getElementById('play').addEventListener('click', startPlaying);
+document.getElementById('pause').addEventListener('click', stopPlaying); // added event listener for pause button
 document.getElementById('stop').addEventListener('click', stopPlaying);
 
 steps.forEach(step => {
