@@ -36,13 +36,10 @@ const soundVolumes = {
   '11': 0.6, '12': 0.8, '13': 0.1
 };
 
-let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-  latencyHint: 'interactive'
-});
-
 let currentStep = 0;
 let isPlaying = false;
 let schedulerTimerId;
+let audioCtx;
 
 const bpmInput = document.getElementById('bpm');
 const steps = document.querySelectorAll('.grid-cell');
@@ -208,16 +205,14 @@ swingInput.addEventListener('input', () => {
   swingAmount = swingInput.value / 100;
 });
 
-const soundKitSelect = document.getElementById('soundKit');
-soundKitSelect.addEventListener('change', () => {
-  const selectedKit = soundKitSelect.value;
-  soundFiles = selectedKit === 'kit2' ? soundFilesKit2 : soundFilesKit1;
+document.getElementById('kitSelector').addEventListener('change', event => {
+  soundFiles = event.target.value === 'kit2' ? soundFilesKit2 : soundFilesKit1;
   loadButton.disabled = false;
   loadButton.style.display = 'inline-block';
   clickCount = 0;
   loadButton.textContent = 'Load 3';
   Object.keys(sounds).forEach(key => delete sounds[key]);
-  loadSounds(); // Voeg deze regel toe om de geluiden opnieuw te laden
+  loadSounds();
 });
 
 steps.forEach(step => {
@@ -303,20 +298,21 @@ async function importPattern(event) {
 document.getElementById('importInput').addEventListener('change', importPattern);
 
 loadButton.addEventListener('click', () => {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
   clickCount++;
   if (clickCount <= 3) {
     loadSounds();
     playDummySound();
     if (clickCount < 3) {
       loadButton.textContent = `Load ${3 - clickCount}`;
-      loadSounds();
     } else {
       loadButton.textContent = 'Done';
       loadButton.disabled = true;
       loadButton.style.display = 'none';
       document.getElementById('play').style.display = 'inline-block';
       document.getElementById('stop').style.display = 'inline-block';
-      loadSounds();
     }
   }
 });
