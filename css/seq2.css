@@ -19,12 +19,12 @@ b {
 }
 
 .container {
-    background: 
-      linear-gradient(135deg,#0000 20.5%,#a50000 0 29.5%,#0000 0) 0 15px,
-      linear-gradient( 45deg,#0000 8%,#a50000 0 17%, #0000 0 58%) 30px 0,
-      linear-gradient(135deg,#0000 8%,#a50000 0 17%, #0000 0 58%,#a50000 0 67%,#0000 0),        
-      linear-gradient( 45deg,#0000 8%,#a50000 0 17%, #0000 0 58%,#a50000 0 67%,#0000 0 83%,#a50000 0 92%,#0000 0),
-      #000000;
+    background:
+        linear-gradient(135deg,#333333 20.5%,#0000 0 29.5%,#333333 0) 0 15px,
+        linear-gradient( 45deg,#333333 8%,#0000 0 17%, #333333 0 58%) 30px 0,
+        linear-gradient(135deg,#333333 8%,#0000 0 17%, #333333 0 58%,#0000 0 67%,#333333 0),
+        linear-gradient( 45deg,#333333 8%,#0000 0 17%, #333333 0 58%,#0000 0 67%,#333333 0 83%,#0000 0 92%,#333333 0),
+        #333333;
     background-size: 60px 60px;
     padding: 20px;
     border-radius: 8px;
