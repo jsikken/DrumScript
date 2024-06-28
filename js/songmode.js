@@ -72,6 +72,7 @@ loadButton.addEventListener('click', () => {
         loadButton.disabled = true;
         loadButton.style.display = 'none';
         document.getElementById('play').style.display = 'inline-block';
+        document.getElementById('stop').style.display = 'inline-block';
     }
 });
 
@@ -145,7 +146,7 @@ function scheduler() {
             scheduleNoteForPattern(pattern, adjustedStep, nextNoteTime);
         });
         
-        const secondsPerBeat = 60.0 / bpmInput.value;
+        const secondsPerBeat = 60.0 / parseFloat(bpmInput.value);
         nextNoteTime += 0.25 * secondsPerBeat * (currentStep % 2 === 1 ? (1.0 + swingAmount) : (1.0 - swingAmount));
         currentStep++;
         
@@ -158,6 +159,9 @@ function scheduler() {
 }
 
 function startPlayback() {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
     nextNoteTime = audioCtx.currentTime;
     currentStep = 0;
     isPlaying = true;
@@ -177,12 +181,6 @@ function stopPlayback() {
 document.getElementById('play').addEventListener('click', () => {
     if (!isPlaying) {
         startPlayback();
-    }
-});
-
-document.getElementById('pause').addEventListener('click', () => {
-    if (isPlaying) {
-        stopPlayback();
     }
 });
 
