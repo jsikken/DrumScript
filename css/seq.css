@@ -174,7 +174,7 @@ footer {
     touch-action: none;
 }
 
-.dropbtn {
+.dropbtn, .dropbtn2 {
   background-color: transparent;
   color: #FFBB00;
   padding: 16px;
