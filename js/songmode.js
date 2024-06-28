@@ -142,7 +142,7 @@ function nextNote() {
     nextNoteTime += 0.25 * secondsPerBeat + swingOffset;
 
     currentStep++;
-    if (currentStep === 32) {
+    if (currentStep === 8) {
         currentStep = 0;
         currentRepetition++;
         
@@ -206,7 +206,7 @@ document.getElementById('stop').addEventListener('click', () => {
 });
 
 function createRepetitionInput(patternIndex) {
-    const container = document.getElementById('pattern-repetitions');
+    const container = document.getElementById('pattern-controls');
     const inputDiv = document.createElement('div');
     inputDiv.innerHTML = `
         <label for="pattern-${patternIndex}-repetitions">Pattern ${patternIndex + 1} repetitions:</label>
