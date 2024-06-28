@@ -83,70 +83,67 @@
             }
         }
 
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('load', checkOrientation);
-
         function chooseKit(scriptSrc) {
-        var oldScript = document.getElementById('kit-script');
-        if (oldScript) {
-            oldScript.remove();
+            var oldScript = document.getElementById('kit-script');
+            if (oldScript) {
+                oldScript.remove();
+            }
+            
+            var newScript = document.createElement('script');
+            newScript.id = 'kit-script';
+            newScript.src = 'js/' + scriptSrc;
+            newScript.onload = function() {
+                console.log("Nieuw script geladen: " + scriptSrc);
+                customRefresh();
+            };
+            document.body.appendChild(newScript);
         }
-        
-        var newScript = document.createElement('script');
-        newScript.id = 'kit-script';
-        newScript.src = 'js/' + scriptSrc;
-        newScript.onload = function() {
-            console.log("Nieuw script geladen: " + scriptSrc);
-            customRefresh();
-        };
-        document.body.appendChild(newScript);
-    }
 
-    function customRefresh() {
-        // Verwijder bestaande event listeners
-        removeEventListeners();
-        
-        // Voer initialisatiefuncties opnieuw uit
-        initializeDrumKit();
-        
-        // Update UI-elementen indien nodig
-        updateUIElements();
-    }
-
-    function removeEventListeners() {
-        // Implementeer hier de logica om event listeners te verwijderen
-        // Bijvoorbeeld:
-        var drumPads = document.querySelectorAll('.key');
-        drumPads.forEach(function(pad) {
-            pad.replaceWith(pad.cloneNode(true));
-        });
-    }
-
-    function initializeDrumKit() {
-        // Implementeer hier de logica om de drumkit te initialiseren
-        // Bijvoorbeeld:
-        var drumPads = document.querySelectorAll('.key');
-        drumPads.forEach(function(pad) {
-            pad.addEventListener('click', playSound);
-        });
-    }
-
-    function updateUIElements() {
-        // Implementeer hier de logica om UI-elementen bij te werken
-        // Bijvoorbeeld:
-        document.querySelectorAll('.key span').forEach(function(span) {
-            span.textContent = span.textContent.toUpperCase();
-        });
-    }
-
-    function playSound(event) {
-        // Implementeer hier de logica om het geluid af te spelen
-        var audio = event.currentTarget.querySelector('audio');
-        if (audio) {
-            audio.currentTime = 0;
-            audio.play();
+        function customRefresh() {
+            // Verwijder bestaande event listeners
+            removeEventListeners();
+            
+            // Voer initialisatiefuncties opnieuw uit
+            initializeDrumKit();
+            
+            // Update UI-elementen indien nodig
+            updateUIElements();
         }
-    }
+
+        function removeEventListeners() {
+            // Implementeer hier de logica om event listeners te verwijderen
+            // Bijvoorbeeld:
+            var drumPads = document.querySelectorAll('.key');
+            drumPads.forEach(function(pad) {
+                pad.replaceWith(pad.cloneNode(true));
+            });
+        }
+
+        function initializeDrumKit() {
+            // Implementeer hier de logica om de drumkit te initialiseren
+            // Bijvoorbeeld:
+            var drumPads = document.querySelectorAll('.key');
+            drumPads.forEach(function(pad) {
+                pad.addEventListener('click', playSound);
+            });
+        }
+
+        function updateUIElements() {
+            // Implementeer hier de logica om UI-elementen bij te werken
+            // Bijvoorbeeld:
+            document.querySelectorAll('.key span').forEach(function(span) {
+                span.textContent = span.textContent.toUpperCase();
+            });
+        }
+
+        function playSound(event) {
+            // Implementeer hier de logica om het geluid af te spelen
+            var audio = event.currentTarget.querySelector('audio');
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play();
+            }
+        }
     </script>
 </body>
 </html>
