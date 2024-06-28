@@ -112,8 +112,8 @@ footer {
 }
 
 .step-indicators .step {
-    background-color: #FFBB00;
-    color: #333;
+    background-color: #0011ff;
+    color: #333333;
     border: none;
     border-radius: 50%;
     width: 40px;
@@ -128,7 +128,7 @@ footer {
 
 .step.active {
     background-color: #333333;
-    color: #FFBB00;
+    color: #0011ff;
 }
 
 .controls {
