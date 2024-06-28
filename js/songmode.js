@@ -102,7 +102,7 @@ function playDummySound() {
 // Hihat choking logic
 let activeHihatOpenSource = null;
 
-function playSoundByKey(key) {
+function playSoundByKey(key, time) {
     if (key === '3' && activeHihatOpenSource) {
         activeHihatOpenSource.stop();
         activeHihatOpenSource = null;
@@ -121,7 +121,7 @@ function playSoundByKey(key) {
         activeHihatOpenSource = source;
     }
 
-    source.start();
+    source.start(time);
 }
 
 function scheduleNote(stepIndex, time) {
@@ -129,7 +129,7 @@ function scheduleNote(stepIndex, time) {
     stepIndicators[stepIndex].classList.add('active');
 
     steps.forEach(step => {
-        if (step.dataset.step == stepIndex + 1 && step.classList.contains('active')) {
+        if (parseInt(step.dataset.step) === stepIndex + 1 && step.classList.contains('active')) {
             const soundKey = step.closest('.drum-row').dataset.sound;
             if (sounds[soundKey]) {
                 playSoundByKey(soundKey, time);
@@ -205,7 +205,7 @@ function loadPattern(pattern) {
     pattern.forEach((row, rowIndex) => {
         row.forEach((cell, cellIndex) => {
             if (cell) {
-                const step = document.querySelector(`.drum-row[data-row="${rowIndex}"] .grid-cell[data-step="${cellIndex + 1}"]`);
+                const step = document.querySelector(`.drum-row[data-row="${rowIndex + 1}"] .grid-cell[data-step="${cellIndex + 1}"]`);
                 step.classList.add('active');
             }
         });
