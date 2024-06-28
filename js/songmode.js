@@ -36,12 +36,12 @@ let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
 
 let currentStep = 0;
 let isPlaying = false;
+let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
 const swingInput = document.getElementById('swing');
 const steps = document.querySelectorAll('.grid-cell');
 const stepIndicators = document.querySelectorAll('.step');
 const sounds = {};
-let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
 let patterns = [];
 
@@ -51,23 +51,15 @@ async function loadSound(url) {
     return audioCtx.decodeAudioData(arrayBuffer);
 }
 
-loadButton.addEventListener('click', () => {
+document.getElementById('loadButton').addEventListener('click', () => {
     clickCount++;
-    
-    if (clickCount === 1 || clickCount === 2 || clickCount === 3) {
-        loadSounds();
-        playDummySound();
-    }
-    
-    if (clickCount < 3) {
-        loadButton.textContent = `Load ${3 - clickCount}`;
-    } else if (clickCount === 3) {
-        loadButton.textContent = 'Done';
-        loadButton.disabled = true;
-        loadButton.style.display = 'none';
-        document.getElementById('play').style.display = 'inline-block';
-        document.getElementById('pause').style.display = 'inline-block'; // added display for pause button
-        document.getElementById('stop').style.display = 'inline-block';
+
+    // Assuming each input is responsible for loading one pattern
+    for (let i = 1; i <= 8; i++) {
+        const input = document.getElementById(`importInput${i}`);
+        input.removeEventListener('change', handlePatternImport); // Clear previous event listeners
+        input.addEventListener('change', handlePatternImport);
+        input.click(); // Trigger click to select file
     }
 });
 
@@ -176,7 +168,7 @@ function startPlaying() {
         currentStep = 0;
         scheduler();
         document.getElementById('play').style.display = 'none';
-        document.getElementById('pause').style.display = 'inline-block';
+        document.getElementById('pause').style.display = 'inline-block'; // Show pause button
         document.getElementById('stop').style.display = 'inline-block';
         console.log('Playback started');
     }
@@ -187,7 +179,7 @@ function stopPlaying() {
         isPlaying = false;
         stepIndicators.forEach(indicator => indicator.classList.remove('active'));
         document.getElementById('play').style.display = 'inline-block';
-        document.getElementById('pause').style.display = 'none';
+        document.getElementById('pause').style.display = 'none'; // Hide pause button
         document.getElementById('stop').style.display = 'none';
         console.log('Playback stopped');
     }
@@ -203,8 +195,11 @@ function handlePatternImport(event) {
         try {
             const contents = e.target.result;
             const pattern = JSON.parse(contents);
+            patterns.push(pattern); // Add loaded pattern to patterns array
+            console.log(`Pattern loaded:`, pattern);
             await loadSounds(); // Ensure sounds are loaded before setting pattern
-            loadPattern(pattern);
+            // Optionally, you can load the pattern immediately upon import
+            // loadPattern(pattern);
         } catch (error) {
             console.error("Error reading the file:", error);
             alert("Failed to import the pattern.");
@@ -212,21 +207,6 @@ function handlePatternImport(event) {
     };
     reader.readAsText(file);
 }
-
-// Functie om het patroon te importeren vanuit een JSON-bestand
-function loadPattern(pattern) {
-    steps.forEach(step => step.classList.remove('active'));
-
-    pattern.forEach(item => {
-        const step = document.querySelector(`.drum-row[data-sound="${item.sound}"] .grid-cell[data-step="${item.step}"]`);
-        if (step) {
-            step.classList.add('active');
-        }
-    });
-}
-
-// Event listeners for import inputs
-document.getElementById('importInput').addEventListener('change', handlePatternImport);
 
 // Event listeners for the buttons
 document.getElementById('play').addEventListener('click', startPlaying);
