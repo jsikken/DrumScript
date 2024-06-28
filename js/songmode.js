@@ -131,9 +131,11 @@ function playSoundByKey(key, time) {
     source.start(time);
 }
 
+let currentPatternIndex = 0;
+
 function scheduleNoteForPattern(pattern, stepIndex, time) {
     pattern.forEach(item => {
-        if (item.step == stepIndex + 1) { // Aangepast om te beginnen bij stap 1
+        if (item.step == stepIndex + 1) {
             playSoundByKey(item.sound, time);
         }
     });
@@ -144,16 +146,18 @@ function nextNote() {
     nextNoteTime += 0.25 * secondsPerBeat;
 
     currentStep++;
-    if (currentStep === 32) { // Aangepast naar 32 stappen (8 maten van 4 beats)
+    if (currentStep === 32) {
         currentStep = 0;
+        currentPatternIndex = (currentPatternIndex + 1) % songPatterns.length;
     }
 }
 
 function scheduler() {
     while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        songPatterns.forEach((pattern) => {
-            scheduleNoteForPattern(pattern, currentStep % 8, nextNoteTime);
-        });
+        if (songPatterns.length > 0) {
+            const currentPattern = songPatterns[currentPatternIndex];
+            scheduleNoteForPattern(currentPattern, currentStep % 8, nextNoteTime);
+        }
         
         nextNote();
     }
@@ -167,6 +171,7 @@ function startPlayback() {
     }
     nextNoteTime = audioCtx.currentTime;
     currentStep = 0;
+    currentPatternIndex = 0;
     isPlaying = true;
     scheduler();
     document.getElementById('play').style.display = 'none';
