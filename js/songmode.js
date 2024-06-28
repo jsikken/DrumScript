@@ -146,7 +146,8 @@ function nextNote() {
         currentStep = 0;
         currentRepetition++;
         
-        if (currentRepetition >= patternRepetitions[currentPatternIndex]) {
+        const repetitions = parseInt(document.getElementById(`pattern-${currentPatternIndex}-repetitions`).value);
+        if (currentRepetition >= repetitions) {
             currentRepetition = 0;
             currentPatternIndex = (currentPatternIndex + 1) % songPatterns.length;
         }
@@ -204,6 +205,21 @@ document.getElementById('stop').addEventListener('click', () => {
     }
 });
 
+function createRepetitionInput(patternIndex) {
+    const container = document.getElementById('pattern-repetitions');
+    const inputDiv = document.createElement('div');
+    inputDiv.innerHTML = `
+        <label for="pattern-${patternIndex}-repetitions">Pattern ${patternIndex + 1} repetitions:</label>
+        <input type="number" id="pattern-${patternIndex}-repetitions" min="1" value="1">
+    `;
+    container.appendChild(inputDiv);
+
+    const input = inputDiv.querySelector('input');
+    input.addEventListener('change', () => {
+        patternRepetitions[patternIndex] = parseInt(input.value);
+    });
+}
+
 async function importPattern(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -217,22 +233,7 @@ async function importPattern(event) {
             songPatterns.push(pattern);
             
             const patternIndex = songPatterns.length - 1;
-            const repetitionInput = document.createElement('input');
-            repetitionInput.type = 'number';
-            repetitionInput.min = '1';
-            repetitionInput.value = '1';
-            repetitionInput.id = `pattern-${patternIndex}-repetitions`;
-            
-            const label = document.createElement('label');
-            label.textContent = `Pattern ${patternIndex + 1} repetitions: `;
-            label.appendChild(repetitionInput);
-            
-            document.getElementById('pattern-controls').appendChild(label);
-            
-            repetitionInput.addEventListener('change', () => {
-                patternRepetitions[patternIndex] = parseInt(repetitionInput.value);
-            });
-            
+            createRepetitionInput(patternIndex);
             patternRepetitions[patternIndex] = 1;
             
             alert('Pattern imported successfully');
