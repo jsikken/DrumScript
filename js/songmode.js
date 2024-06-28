@@ -139,7 +139,7 @@ function nextNote() {
     if (currentStep % 2 !== 0 && swingAmount > 0) {
         swingOffset = (Math.random() - 0.5) * swingAmount * 0.5 * secondsPerBeat;
     }
-    nextNoteTime += 0.25 * secondsPerBeat + swingOffset;
+    nextNoteTime += 0.5 * secondsPerBeat + swingOffset; // Correct BPM calculation
 
     currentStep++;
     if (currentStep === 8) {
@@ -247,6 +247,8 @@ async function importPattern(event) {
         console.error('Error reading the file:', reader.error);
         alert('Failed to import the pattern');
     };
+
+    reader.readAsText(file);
 }
 
 for (let i = 1; i <= 8; i++) {
