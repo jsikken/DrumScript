@@ -97,18 +97,22 @@
         window.addEventListener('load', checkOrientation);
 
         function chooseKit(scriptSrc) {
-            console.log("Changing kit to: " + scriptSrc);
             var oldScript = document.getElementById('kit-script');
             if (oldScript) {
                 oldScript.remove();
             }
-
+            
             var newScript = document.createElement('script');
             newScript.id = 'kit-script';
             newScript.src = 'js/' + scriptSrc;
             newScript.onload = function() {
-                console.log("New script loaded: " + scriptSrc);
-                updateAudioSources(scriptSrc.replace('.js', ''));
+                console.log("Nieuw script geladen: " + scriptSrc);
+                // Voer hier eventuele initialisatiefuncties uit
+                
+                // Refresh de pagina na een korte vertraging
+                setTimeout(function() {
+                location.reload();
+                }, 100);
             };
             document.body.appendChild(newScript);
         }
