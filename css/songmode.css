@@ -92,21 +92,26 @@ footer {
 }
 
 #pattern-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 20px;
+}
+
+#pattern-controls div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 #pattern-controls label {
-    display: block;
-    margin-top: 10px;
+    margin-bottom: 5px;
 }
 
-#pattern-import {
-    margin-top: 20px;
-}
-
-#pattern-import input {
-    display: block;
-    margin-top: 5px;
+#pattern-controls input {
+    width: 50px;
+    text-align: center;
 }
 
 #sequencer {
