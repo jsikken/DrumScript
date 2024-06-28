@@ -97,6 +97,7 @@
         window.addEventListener('load', checkOrientation);
 
         function chooseKit(scriptSrc) {
+            console.log("Changing kit to: " + scriptSrc);
             var oldScript = document.getElementById('kit-script');
             if (oldScript) {
                 oldScript.remove();
@@ -104,19 +105,22 @@
 
             var newScript = document.createElement('script');
             newScript.id = 'kit-script';
-            newScript.src = 'js/' + scriptSrc; // Voeg het juiste pad toe
+            newScript.src = 'js/' + scriptSrc;
+            newScript.onload = function() {
+                console.log("New script loaded: " + scriptSrc);
+                updateAudioSources(scriptSrc.replace('.js', ''));
+            };
             document.body.appendChild(newScript);
-
-            // Update de audio bronnen
-            updateAudioSources(scriptSrc.replace('.js', ''));
         }
 
         function updateAudioSources(kitName) {
+            console.log("Updating audio sources for kit: " + kitName);
             var audioElements = document.getElementsByTagName('audio');
             for (var i = 0; i < audioElements.length; i++) {
                 var audio = audioElements[i];
                 var oldSrc = audio.src;
                 var newSrc = oldSrc.replace(/kit\d+/, kitName);
+                console.log("Changing audio source from " + oldSrc + " to " + newSrc);
                 audio.src = newSrc;
             }
         }
