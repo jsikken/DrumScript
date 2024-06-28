@@ -46,9 +46,14 @@ let patterns = [];
 let patternsQueue = []; // Queue to hold patterns
 
 async function loadSound(url) {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    return audioCtx.decodeAudioData(arrayBuffer);
+    try {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        return await audioCtx.decodeAudioData(arrayBuffer);
+    } catch (error) {
+        console.error('Error loading sound:', error);
+        throw error; // Propagate the error to the caller
+    }
 }
 
 async function loadSounds() {
@@ -70,19 +75,24 @@ async function loadSounds() {
     }
 }
 
-document.getElementById('loadButton').addEventListener('click', () => {
+document.getElementById('loadButton').addEventListener('click', async () => {
     clickCount++;
-    loadSounds();
-    playDummySound();
+    try {
+        await loadSounds();
+        playDummySound();
 
-    if (clickCount < 3) {
-        document.getElementById('loadButton').textContent = `Load ${3 - clickCount}`;
-    } else if (clickCount === 3) {
-        document.getElementById('loadButton').textContent = 'Done';
-        document.getElementById('loadButton').disabled = true;
-        document.getElementById('loadButton').style.display = 'none';
-        document.getElementById('play').style.display = 'inline-block';
-        document.getElementById('rec').style.display = 'inline-block';
+        if (clickCount < 3) {
+            document.getElementById('loadButton').textContent = `Load ${3 - clickCount}`;
+        } else if (clickCount === 3) {
+            document.getElementById('loadButton').textContent = 'Done';
+            document.getElementById('loadButton').disabled = true;
+            document.getElementById('loadButton').style.display = 'none';
+            document.getElementById('play').style.display = 'inline-block';
+            document.getElementById('rec').style.display = 'inline-block';
+        }
+    } catch (error) {
+        console.error('Failed to load sounds:', error);
+        alert('Failed to load sounds. Please try again.');
     }
 });
 
