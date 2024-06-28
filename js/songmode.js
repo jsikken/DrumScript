@@ -15,19 +15,9 @@ const soundFiles = {
 };
 
 const soundVolumes = {
-    '1': 0.8,
-    '2': 0.7,
-    '3': 0.6,
-    '4': 0.6,
-    '5': 0.7,
-    '6': 0.7,
-    '7': 0.8,
-    '8': 0.7,
-    '9': 0.7,
-    '10': 0.8,
-    '11': 0.6,
-    '12': 0.8,
-    '13': 0.1
+    '1': 0.8, '2': 0.7, '3': 0.6, '4': 0.6, '5': 0.7,
+    '6': 0.7, '7': 0.8, '8': 0.7, '9': 0.7, '10': 0.8,
+    '11': 0.6, '12': 0.8, '13': 0.1
 };
 
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
@@ -43,6 +33,7 @@ const swingInput = document.getElementById('swing');
 let swingAmount = swingInput.value / 100;
 const sounds = {};
 const songPatterns = [];
+const patternRepetitions = [];
 
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
@@ -50,6 +41,9 @@ let clickCount = 0;
 const lookahead = 25.0;
 const scheduleAheadTime = 0.1;
 let nextNoteTime = 0.0;
+
+let currentPatternIndex = 0;
+let currentRepetition = 0;
 
 async function loadSound(url) {
     const response = await fetch(url);
@@ -131,8 +125,6 @@ function playSoundByKey(key, time) {
     source.start(time);
 }
 
-let currentPatternIndex = 0;
-
 function scheduleNoteForPattern(pattern, stepIndex, time) {
     pattern.forEach(item => {
         if (item.step == stepIndex + 1) {
@@ -152,7 +144,12 @@ function nextNote() {
     currentStep++;
     if (currentStep === 32) {
         currentStep = 0;
-        currentPatternIndex = (currentPatternIndex + 1) % songPatterns.length;
+        currentRepetition++;
+        
+        if (currentRepetition >= patternRepetitions[currentPatternIndex]) {
+            currentRepetition = 0;
+            currentPatternIndex = (currentPatternIndex + 1) % songPatterns.length;
+        }
     }
 }
 
@@ -161,6 +158,9 @@ function scheduler() {
         if (songPatterns.length > 0) {
             const currentPattern = songPatterns[currentPatternIndex];
             scheduleNoteForPattern(currentPattern, currentStep % 8, nextNoteTime);
+            
+            stepIndicators.forEach(indicator => indicator.classList.remove('active'));
+            stepIndicators[currentStep % 8].classList.add('active');
         }
         
         nextNote();
@@ -176,6 +176,7 @@ function startPlayback() {
     nextNoteTime = audioCtx.currentTime;
     currentStep = 0;
     currentPatternIndex = 0;
+    currentRepetition = 0;
     isPlaying = true;
     scheduler();
     document.getElementById('play').style.display = 'none';
@@ -186,6 +187,7 @@ function stopPlayback() {
     isPlaying = false;
     clearTimeout(schedulerTimerId);
     currentStep = 0;
+    stepIndicators.forEach(indicator => indicator.classList.remove('active'));
     document.getElementById('play').style.display = 'inline-block';
     document.getElementById('stop').style.display = 'none';
 }
@@ -213,6 +215,26 @@ async function importPattern(event) {
         try {
             const pattern = JSON.parse(reader.result);
             songPatterns.push(pattern);
+            
+            const patternIndex = songPatterns.length - 1;
+            const repetitionInput = document.createElement('input');
+            repetitionInput.type = 'number';
+            repetitionInput.min = '1';
+            repetitionInput.value = '1';
+            repetitionInput.id = `pattern-${patternIndex}-repetitions`;
+            
+            const label = document.createElement('label');
+            label.textContent = `Pattern ${patternIndex + 1} repetitions: `;
+            label.appendChild(repetitionInput);
+            
+            document.getElementById('pattern-controls').appendChild(label);
+            
+            repetitionInput.addEventListener('change', () => {
+                patternRepetitions[patternIndex] = parseInt(repetitionInput.value);
+            });
+            
+            patternRepetitions[patternIndex] = 1;
+            
             alert('Pattern imported successfully');
         } catch (error) {
             console.error('Error reading the file:', error);
@@ -227,4 +249,11 @@ for (let i = 1; i <= 8; i++) {
 
 swingInput.addEventListener('input', (event) => {
     swingAmount = event.target.value / 100;
+});
+
+bpmInput.addEventListener('input', () => {
+    if (isPlaying) {
+        clearTimeout(schedulerTimerId);
+        scheduler();
+    }
 });
