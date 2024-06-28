@@ -5,9 +5,14 @@ body {
   height: 100vh;
   color: #FFBB00;
   font-family: sans-serif;
-  background-color: #333333;
+  /*Old background:*/
+  /*background-color: #333333;
   background-image: radial-gradient(#FFBB00 0.5px, #333333 0.5px);
-  background-size: 10px 10px;
+  background-size: 10px 10px; */
+  background: radial-gradient(at bottom right, #333333 0, #333333 7.5px, rgba(51,51,51,0.2) 7.5px, rgba(51,51,51,0.2) 15px, rgba(51,51,51,0.75) 15px, rgba(51,51,51,0.75) 22.5px, rgba(51,51,51,0.25) 22.5px, rgba(51,51,51,0.25) 30px, rgba(51,51,51,0.3) 30px, rgba(51,51,51,0.3) 37.5px, rgba(51,51,51,0.75) 37.5px, rgba(51,51,51,0.75) 45px, rgba(51,51,51,0.2) 45px, rgba(51,51,51,0.2) 52.5px, transparent 52.5px, transparent 60px), radial-gradient(at top left, transparent 0, transparent 7.5px, rgba(51,51,51,0.2) 7.5px, rgba(51,51,51,0.2) 15px, rgba(51,51,51,0.75) 15px, rgba(51,51,51,0.75) 22.5px, rgba(51,51,51,0.3) 22.5px, rgba(51,51,51,0.3) 30px, rgba(51,51,51,0.25) 30px, rgba(51,51,51,0.25) 37.5px, rgba(51,51,51,0.75) 37.5px, rgba(51,51,51,0.75) 45px, rgba(51,51,51,0.2) 45px, rgba(51,51,51,0.2) 52.5px, #333333 52.5px, #333333 60px, transparent 60px, transparent 150px);
+  background-blend-mode: multiply;
+  background-size: 60px 60px, 60px 60px;
+  background-color: #ffbb00;
   overflow: hidden;
   touch-action: none;
 }
