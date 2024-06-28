@@ -229,7 +229,6 @@ function handlePatternImport(event) {
     reader.readAsText(file);
 }
 
-// Function to export the pattern to a JSON file
 function exportPattern() {
     const pattern = [];
 
@@ -242,4 +241,18 @@ function exportPattern() {
         }
     });
 
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pattern));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "pattern.json");
+    document.body.appendChild(downloadAnchorNode); // required for Firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+document.getElementById('exportButton').addEventListener('click', exportPattern);
+
+// Continue here with remaining functions and event listeners...
+
+// Example: Adding the event listener for handlePatternImport if not added already
+document.getElementById('importButton').addEventListener('change', handlePatternImport);
