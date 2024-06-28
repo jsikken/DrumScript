@@ -83,51 +83,70 @@
             }
         }
 
-        function checkOrientation() {
-            if (window.innerHeight < window.innerWidth) {
-                document.getElementById('landscape-warning').style.display = 'flex';
-                document.getElementById('content').style.display = 'none';
-            } else {
-                document.getElementById('landscape-warning').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            }
-        }
-
         window.addEventListener('resize', checkOrientation);
         window.addEventListener('load', checkOrientation);
 
         function chooseKit(scriptSrc) {
-            var oldScript = document.getElementById('kit-script');
-            if (oldScript) {
-                oldScript.remove();
-            }
-            
-            var newScript = document.createElement('script');
-            newScript.id = 'kit-script';
-            newScript.src = 'js/' + scriptSrc;
-            newScript.onload = function() {
-                console.log("Nieuw script geladen: " + scriptSrc);
-                // Voer hier eventuele initialisatiefuncties uit
-                
-                // Refresh de pagina na een korte vertraging
-                setTimeout(function() {
-                location.reload();
-                }, 100);
-            };
-            document.body.appendChild(newScript);
+        var oldScript = document.getElementById('kit-script');
+        if (oldScript) {
+            oldScript.remove();
         }
+        
+        var newScript = document.createElement('script');
+        newScript.id = 'kit-script';
+        newScript.src = 'js/' + scriptSrc;
+        newScript.onload = function() {
+            console.log("Nieuw script geladen: " + scriptSrc);
+            customRefresh();
+        };
+        document.body.appendChild(newScript);
+    }
 
-        function updateAudioSources(kitName) {
-            console.log("Updating audio sources for kit: " + kitName);
-            var audioElements = document.getElementsByTagName('audio');
-            for (var i = 0; i < audioElements.length; i++) {
-                var audio = audioElements[i];
-                var oldSrc = audio.src;
-                var newSrc = oldSrc.replace(/kit\d+/, kitName);
-                console.log("Changing audio source from " + oldSrc + " to " + newSrc);
-                audio.src = newSrc;
-            }
+    function customRefresh() {
+        // Verwijder bestaande event listeners
+        removeEventListeners();
+        
+        // Voer initialisatiefuncties opnieuw uit
+        initializeDrumKit();
+        
+        // Update UI-elementen indien nodig
+        updateUIElements();
+    }
+
+    function removeEventListeners() {
+        // Implementeer hier de logica om event listeners te verwijderen
+        // Bijvoorbeeld:
+        var drumPads = document.querySelectorAll('.key');
+        drumPads.forEach(function(pad) {
+            pad.replaceWith(pad.cloneNode(true));
+        });
+    }
+
+    function initializeDrumKit() {
+        // Implementeer hier de logica om de drumkit te initialiseren
+        // Bijvoorbeeld:
+        var drumPads = document.querySelectorAll('.key');
+        drumPads.forEach(function(pad) {
+            pad.addEventListener('click', playSound);
+        });
+    }
+
+    function updateUIElements() {
+        // Implementeer hier de logica om UI-elementen bij te werken
+        // Bijvoorbeeld:
+        document.querySelectorAll('.key span').forEach(function(span) {
+            span.textContent = span.textContent.toUpperCase();
+        });
+    }
+
+    function playSound(event) {
+        // Implementeer hier de logica om het geluid af te spelen
+        var audio = event.currentTarget.querySelector('audio');
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play();
         }
+    }
     </script>
 </body>
 </html>
