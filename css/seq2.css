@@ -182,7 +182,7 @@ footer {
   border: none;
 }
 
-.dropdown, .dropdownseq {
+.dropdown {
   position: relative;
   display: inline-block;
 }
