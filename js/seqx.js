@@ -216,7 +216,7 @@ soundKitSelect.addEventListener('change', () => {
   loadButton.style.display = 'inline-block';
   clickCount = 0;
   loadButton.textContent = 'Load 3';
-  sounds = {};
+  Object.keys(sounds).forEach(key => delete sounds[key]);
   loadSounds(); // Voeg deze regel toe om de geluiden opnieuw te laden
 });
 
