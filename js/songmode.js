@@ -54,12 +54,19 @@ async function loadSound(url) {
 document.getElementById('loadButton').addEventListener('click', () => {
     clickCount++;
 
-    // Assuming each input is responsible for loading one pattern
-    for (let i = 1; i <= 8; i++) {
-        const input = document.getElementById(`importInput${i}`);
-        input.removeEventListener('change', handlePatternImport); // Clear previous event listeners
-        input.addEventListener('change', handlePatternImport);
-        input.click(); // Trigger click to select file
+    if (clickCount === 1 || clickCount === 2 || clickCount === 3) {
+        loadSounds();
+        playDummySound();
+    }
+    
+    if (clickCount < 3) {
+        document.getElementById('loadButton').textContent = `Load ${3 - clickCount}`;
+    } else if (clickCount === 3) {
+        document.getElementById('loadButton').textContent = 'Done';
+        document.getElementById('loadButton').disabled = true;
+        document.getElementById('loadButton').style.display = 'none';
+        document.getElementById('play').style.display = 'inline-block';
+        document.getElementById('rec').style.display = 'inline-block';
     }
 });
 
