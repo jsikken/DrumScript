@@ -11,13 +11,23 @@ const soundFiles = {
     '10': './kit1/china.m4a',
     '11': './kit1/gunshotwav.m4a',
     '12': './kit1/stick.m4a',
-    '13': './dummy.m4a' // Dummy file
+    '13': 'dummy.m4a'
 };
 
 const soundVolumes = {
-    '1': 0.8, '2': 0.7, '3': 0.6, '4': 0.6, '5': 0.7,
-    '6': 0.7, '7': 0.8, '8': 0.7, '9': 0.7, '10': 0.8,
-    '11': 0.6, '12': 0.8, '13': 0.1 // Dummy file volume set to 0
+    '1': 0.8,
+    '2': 0.7,
+    '3': 0.6,
+    '4': 0.6,
+    '5': 0.7,
+    '6': 0.7,
+    '7': 0.8,
+    '8': 0.7,
+    '9': 0.7,
+    '10': 0.8,
+    '11': 0.6,
+    '12': 0.8,
+    '13': 0.1
 };
 
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
@@ -26,13 +36,20 @@ let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
 
 let currentStep = 0;
 let isPlaying = false;
+let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
-const swingInput = document.getElementById('swing');
 const stepIndicators = document.querySelectorAll('.step');
+const swingInput = document.getElementById('swing');
+let swingAmount = swingInput.value / 100;
 const sounds = {};
-let patternsQueue = [];
-let currentPatternIndex = 0;
+const songPatterns = [];
+
+let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
+
+const lookahead = 25.0;
+const scheduleAheadTime = 0.1;
+let nextNoteTime = 0.0;
 
 async function loadSound(url) {
     const response = await fetch(url);
@@ -40,15 +57,31 @@ async function loadSound(url) {
     return audioCtx.decodeAudioData(arrayBuffer);
 }
 
+loadButton.addEventListener('click', () => {
+    clickCount++;
+    
+    if (clickCount === 1 || clickCount === 2 || clickCount === 3) {
+        loadSounds();
+        playDummySound();
+    }
+    
+    if (clickCount < 3) {
+        loadButton.textContent = `Load ${3 - clickCount}`;
+    } else if (clickCount === 3) {
+        loadButton.textContent = 'Done';
+        loadButton.disabled = true;
+        loadButton.style.display = 'none';
+        document.getElementById('play').style.display = 'inline-block';
+    }
+});
+
 async function loadSounds() {
     try {
-        const promises = Object.keys(soundFiles).map(key =>
-            loadSound(soundFiles[key]).then(buffer => {
-                sounds[key] = buffer;
-                console.log(`Sound ${key} loaded successfully`);
-            })
-        );
-        await Promise.all(promises);
+        for (let key in soundFiles) {
+            const buffer = await loadSound(soundFiles[key]);
+            sounds[key] = buffer;
+            console.log(`Sound ${key} loaded successfully`);
+        }
         console.log('All sounds loaded');
     } catch (error) {
         console.error('Error loading sounds:', error);
@@ -73,153 +106,115 @@ function playDummySound() {
     }
 }
 
-function scheduleNote(stepIndex, time) {
-    stepIndicators.forEach(indicator => indicator.classList.remove('active'));
-    stepIndicators[stepIndex].classList.add('active');
-    
-    const currentPattern = patternsQueue[currentPatternIndex];
-    if (currentPattern && currentPattern[stepIndex]) {
-        currentPattern[stepIndex].forEach(sound => {
-            if (sounds[sound]) {
-                playSound(sounds[sound], time, soundVolumes[sound]);
-            }
-        });
+let activeHihatOpenSource = null;
+
+function playSoundByKey(key, time) {
+    if (key === '3' && activeHihatOpenSource) {
+        activeHihatOpenSource.stop(time);
+        activeHihatOpenSource = null;
     }
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = sounds[key];
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = soundVolumes[key] || 1;
+    source.connect(gainNode).connect(audioCtx.destination);
+
+    if (key === '4') {
+        if (activeHihatOpenSource) {
+            activeHihatOpenSource.stop(time);
+        }
+        activeHihatOpenSource = source;
+    }
+
+    source.start(time);
 }
 
-function nextNote() {
-    const bpm = parseFloat(bpmInput.value);
-    const secondsPerBeat = 60.0 / bpm;
-    const swingAmount = parseFloat(swingInput.value) / 100;
-    
-    let nextStepTime = secondsPerBeat / 2;
-    if (currentStep % 2 !== 0 && swingAmount > 0) {
-        nextStepTime += (Math.random() - 0.5) * swingAmount * secondsPerBeat * 0.5;
-    }
-    
-    return nextStepTime;
+function scheduleNoteForPattern(pattern, stepIndex, time) {
+    pattern.forEach(item => {
+        if (item.step == stepIndex) {
+            playSoundByKey(item.sound, time);
+        }
+    });
 }
 
 function scheduler() {
-    if (patternsQueue.length === 0) {
-        console.log('No patterns in queue to play.');
-        stopPlaying();
-        return;
-    }
-
-    isPlaying = true;
-    currentStep = 0;
-
-    function playNextStep() {
-        if (!isPlaying) return;
-
-        const currentPattern = patternsQueue[currentPatternIndex];
-        if (!currentPattern) {
-            currentPatternIndex = (currentPatternIndex + 1) % patternsQueue.length;
-            currentStep = 0;
-            setTimeout(playNextStep, 0);
-            return;
-        }
-
-        if (currentStep >= 8) {
-            currentPatternIndex = (currentPatternIndex + 1) % patternsQueue.length;
-            currentStep = 0;
-            setTimeout(playNextStep, 0);
-            return;
-        }
-
-        const time = audioCtx.currentTime;
-        scheduleNote(currentStep, time);
-        currentStep++;
-
-        setTimeout(playNextStep, nextNote() * 1000);
-    }
-
-    playNextStep();
-}
-
-function startPlaying() {
-    if (!isPlaying) {
-        audioCtx.resume().then(() => {
-            scheduler();
-            document.getElementById('play').style.display = 'none';
-            document.getElementById('pause').style.display = 'inline-block';
-            document.getElementById('stop').style.display = 'inline-block';
+    while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+        songPatterns.forEach((pattern, index) => {
+            const adjustedStep = (currentStep + index) % 8;
+            scheduleNoteForPattern(pattern, adjustedStep, nextNoteTime);
         });
-    }
-}
-
-function pausePlaying() {
-    if (isPlaying) {
-        audioCtx.suspend();
-        isPlaying = false;
-        document.getElementById('play').style.display = 'inline-block';
-        document.getElementById('pause').style.display = 'none';
-    }
-}
-
-function stopPlaying() {
-    isPlaying = false;
-    audioCtx.suspend();
-    stepIndicators.forEach(indicator => indicator.classList.remove('active'));
-    document.getElementById('play').style.display = 'inline-block';
-    document.getElementById('pause').style.display = 'none';
-    document.getElementById('stop').style.display = 'none';
-    currentPatternIndex = 0;
-    currentStep = 0;
-}
-
-async function importPattern(event, index) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    try {
-        const pattern = await readJSONFile(file);
-        patternsQueue[index - 1] = pattern;
-        console.log(`Pattern ${index} loaded:`, pattern);
-    } catch (error) {
-        console.error("Error reading the file:", error);
-        alert("Failed to import the pattern.");
-    }
-}
-
-function readJSONFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(JSON.parse(e.target.result));
-        reader.onerror = (error) => reject(error);
-        reader.readAsText(file);
-    });
-}
-
-document.getElementById('loadButton').addEventListener('click', async () => {
-    clickCount++;
-    try {
-        await loadSounds();
-        playDummySound();
-        if (clickCount < 3) {
-            document.getElementById('loadButton').textContent = `Load ${3 - clickCount}`;
-        } else if (clickCount === 3) {
-            document.getElementById('loadButton').textContent = 'Done';
-            document.getElementById('loadButton').disabled = true;
-            document.getElementById('loadButton').style.display = 'none';
-            document.getElementById('play').style.display = 'inline-block';
+        
+        const secondsPerBeat = 60.0 / bpmInput.value;
+        nextNoteTime += 0.25 * secondsPerBeat * (currentStep % 2 === 1 ? (1.0 + swingAmount) : (1.0 - swingAmount));
+        currentStep++;
+        
+        if (currentStep >= 8) {
+            currentStep = 0;
         }
-    } catch (error) {
-        console.error('Failed to load sounds:', error);
-        alert('Failed to load sounds. Please try again.');
+    }
+    
+    schedulerTimerId = setTimeout(scheduler, lookahead);
+}
+
+function startPlayback() {
+    nextNoteTime = audioCtx.currentTime;
+    currentStep = 0;
+    isPlaying = true;
+    scheduler();
+    document.getElementById('play').style.display = 'none';
+    document.getElementById('stop').style.display = 'inline-block';
+}
+
+function stopPlayback() {
+    isPlaying = false;
+    clearTimeout(schedulerTimerId);
+    currentStep = 0;
+    document.getElementById('play').style.display = 'inline-block';
+    document.getElementById('stop').style.display = 'none';
+}
+
+document.getElementById('play').addEventListener('click', () => {
+    if (!isPlaying) {
+        startPlayback();
     }
 });
 
-document.getElementById('play').addEventListener('click', startPlaying);
-document.getElementById('pause').addEventListener('click', pausePlaying);
-document.getElementById('stop').addEventListener('click', stopPlaying);
+document.getElementById('pause').addEventListener('click', () => {
+    if (isPlaying) {
+        stopPlayback();
+    }
+});
 
-for (let i = 1; i <= 8; i++) {
-    document.getElementById(`importInput${i}`).addEventListener('change', function(event) {
-        importPattern(event, i);
-    });
+document.getElementById('stop').addEventListener('click', () => {
+    if (isPlaying) {
+        stopPlayback();
+    }
+});
+
+async function importPattern(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    reader.onload = () => {
+        try {
+            const pattern = JSON.parse(reader.result);
+            songPatterns.push(pattern);
+            alert('Pattern imported successfully');
+        } catch (error) {
+            console.error('Error reading the file:', error);
+            alert('Failed to import the pattern');
+        }
+    };
 }
 
-// Initial setup
-loadSounds();
+for (let i = 1; i <= 8; i++) {
+    document.getElementById(`importInput${i}`).addEventListener('change', importPattern);
+}
+
+swingInput.addEventListener('input', (event) => {
+    swingAmount = event.target.value / 100;
+});
