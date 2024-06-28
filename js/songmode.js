@@ -44,6 +44,7 @@ const stepIndicators = document.querySelectorAll('.step');
 const sounds = {};
 let clickCount = 0;
 let patterns = [];
+let patternsQueue = []; // Queue to hold patterns
 
 async function loadSound(url) {
     const response = await fetch(url);
@@ -161,19 +162,37 @@ function nextNote() {
 }
 
 function scheduler() {
-    while (isPlaying && currentStep < 8) {
-        const currentTime = audioCtx.currentTime;
-        scheduleNote(currentStep, currentTime);
-        currentStep++;
-        setTimeout(scheduler, (nextNote() - currentTime) * 1000);
+    if (patternsQueue.length === 0) {
+        console.log('No patterns in queue to play.');
+        stopPlaying();
+        return;
     }
+
+    isPlaying = true;
+    currentStep = 0;
+    
+    const pattern = patternsQueue[0]; // Get the first pattern in the queue
+    console.log('Playing pattern:', pattern);
+
+    function playPatternStep() {
+        if (!isPlaying || currentStep >= pattern.length) {
+            stopPlaying();
+            return;
+        }
+
+        const step = pattern[currentStep];
+        const currentTime = audioCtx.currentTime;
+        scheduleNote(step.step - 1, currentTime); // step.step is 1-based, convert to 0-based for scheduleNote
+        currentStep++;
+        setTimeout(playPatternStep, (nextNote() - currentTime) * 1000);
+    }
+
+    playPatternStep(); // Start playing the pattern
 }
 
 function startPlaying() {
     if (!isPlaying) {
-        isPlaying = true;
-        currentStep = 0;
-        scheduler();
+        scheduler(); // Start playing the patterns queue
         document.getElementById('play').style.display = 'none';
         document.getElementById('pause').style.display = 'inline-block'; // Show pause button
         document.getElementById('stop').style.display = 'inline-block';
@@ -182,37 +201,42 @@ function startPlaying() {
 }
 
 function stopPlaying() {
-    if (isPlaying) {
-        isPlaying = false;
-        stepIndicators.forEach(indicator => indicator.classList.remove('active'));
-        document.getElementById('play').style.display = 'inline-block';
-        document.getElementById('pause').style.display = 'none'; // Hide pause button
-        document.getElementById('stop').style.display = 'none';
-        console.log('Playback stopped');
-    }
+    isPlaying = false;
+    stepIndicators.forEach(indicator => indicator.classList.remove('active'));
+    document.getElementById('play').style.display = 'inline-block';
+    document.getElementById('pause').style.display = 'none'; // Hide pause button
+    document.getElementById('stop').style.display = 'none';
+    console.log('Playback stopped');
+}
+
+// Function to handle pattern import
+function handlePatternImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const contents = e.target.result;
+            const pattern = JSON.parse(contents);
+            patterns.push(pattern); // Add loaded pattern to patterns array
+            patternsQueue.push(pattern); // Add loaded pattern to patterns queue
+            console.log(`Pattern loaded:`, pattern);
+            await loadSounds(); // Ensure sounds are loaded before setting pattern
+            // Optionally, you can load the pattern immediately upon import
+            // loadPattern(pattern);
+        } catch (error) {
+            console.error("Error reading the file:", error);
+            alert("Failed to import the pattern.");
+        }
+    };
+    reader.readAsText(file);
 }
 
 // Event listeners for the buttons
-document.getElementById('play').addEventListener('click', () => {
-    startPlaying();
-    document.getElementById('play').style.display = 'none';
-    document.getElementById('pause').style.display = 'inline-block'; // Show pause button
-    document.getElementById('stop').style.display = 'inline-block';
-});
-
-document.getElementById('pause').addEventListener('click', () => {
-    stopPlaying();
-    document.getElementById('play').style.display = 'inline-block';
-    document.getElementById('pause').style.display = 'none'; // Hide pause button
-    document.getElementById('stop').style.display = 'none';
-});
-
-document.getElementById('stop').addEventListener('click', () => {
-    stopPlaying();
-    document.getElementById('play').style.display = 'inline-block';
-    document.getElementById('pause').style.display = 'none'; // Hide pause button
-    document.getElementById('stop').style.display = 'none';
-});
+document.getElementById('play').addEventListener('click', startPlaying);
+document.getElementById('pause').addEventListener('click', stopPlaying); // added event listener for pause button
+document.getElementById('stop').addEventListener('click', stopPlaying);
 
 steps.forEach(step => {
     step.addEventListener('click', () => {
