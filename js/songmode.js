@@ -11,13 +11,13 @@ const soundFiles = {
     '10': './kit1/china.m4a',
     '11': './kit1/gunshotwav.m4a',
     '12': './kit1/stick.m4a',
-    '13': './dummy.m4a'
+    '13': './dummy.m4a' // Dummy file
 };
 
 const soundVolumes = {
     '1': 0.8, '2': 0.7, '3': 0.6, '4': 0.6, '5': 0.7,
     '6': 0.7, '7': 0.8, '8': 0.7, '9': 0.7, '10': 0.8,
-    '11': 0.6, '12': 0.8, '13': 0.1
+    '11': 0.6, '12': 0.8, '13': 0.1 // Dummy file volume set to 0
 };
 
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
@@ -42,11 +42,13 @@ async function loadSound(url) {
 
 async function loadSounds() {
     try {
-        for (let key in soundFiles) {
-            const buffer = await loadSound(soundFiles[key]);
-            sounds[key] = buffer;
-            console.log(`Sound ${key} loaded successfully`);
-        }
+        const promises = Object.keys(soundFiles).map(key =>
+            loadSound(soundFiles[key]).then(buffer => {
+                sounds[key] = buffer;
+                console.log(`Sound ${key} loaded successfully`);
+            })
+        );
+        await Promise.all(promises);
         console.log('All sounds loaded');
     } catch (error) {
         console.error('Error loading sounds:', error);
