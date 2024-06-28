@@ -82,10 +82,44 @@ async function loadSounds() {
         }
         await Promise.all(promises);
         console.log('All sounds loaded');
+
+        // Als geluiden klaar zijn met laden, start het afspelen
+        if (isPlaying) {
+            scheduler(); // Start playing the patterns queue
+        }
     } catch (error) {
         console.error('Error loading sounds:', error);
     }
 }
+
+// Event listener voor 'Play' knop
+document.getElementById('play').addEventListener('click', startPlaying);
+
+// Event listener voor 'Stop' knop
+document.getElementById('stop').addEventListener('click', stopPlaying);
+
+// Event listener voor 'Pause' knop
+document.getElementById('pause').addEventListener('click', stopPlaying);
+
+// Event listener voor 'Load' knop
+document.getElementById('loadButton').addEventListener('click', () => {
+    clickCount++;
+
+    if (clickCount === 1 || clickCount === 2 || clickCount === 3) {
+        loadSounds();
+        playDummySound();
+    }
+    
+    if (clickCount < 3) {
+        document.getElementById('loadButton').textContent = `Load ${3 - clickCount}`;
+    } else if (clickCount === 3) {
+        document.getElementById('loadButton').textContent = 'Done';
+        document.getElementById('loadButton').disabled = true;
+        document.getElementById('loadButton').style.display = 'none';
+        document.getElementById('play').style.display = 'inline-block';
+        document.getElementById('rec').style.display = 'inline-block';
+    }
+});
 
 function playSound(buffer, time, volume) {
     const source = audioCtx.createBufferSource();
