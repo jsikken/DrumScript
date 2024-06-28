@@ -38,11 +38,13 @@ let currentStep = 0;
 let isPlaying = false;
 let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
+const swingInput = document.getElementById('swing');
 const steps = document.querySelectorAll('.grid-cell');
 const stepIndicators = document.querySelectorAll('.step');
 const sounds = {};
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
+let patterns = [];
 
 async function loadSound(url) {
     const response = await fetch(url);
@@ -145,33 +147,30 @@ function scheduleNote(stepIndex, time) {
 
 function nextNote() {
     const secondsPerBeat = 60.0 / bpmInput.value;
-    currentStep++;
-    if (currentStep === 8) {
-        currentStep = 0;
+    let swingOffset = 0;
+
+    // Calculate swing offset for every second step with randomization
+    if (currentStep % 2 !== 0 && swingInput.value > 0) {
+        // Generate a random number between -0.5 and 0.5, then scale by swingAmount and secondsPerBeat
+        swingOffset = (Math.random() - 0.5) * swingInput.value * 0.01 * secondsPerBeat;
     }
-    return audioCtx.currentTime + secondsPerBeat / 2;
+
+    return audioCtx.currentTime + (0.5 * secondsPerBeat + swingOffset);
 }
 
 function scheduler() {
-    while (nextNoteTime < audioCtx.currentTime + 0.1) {
-        scheduleNote(currentStep, nextNoteTime);
-        nextNoteTime = nextNote();
+    while (isPlaying && currentStep < 8) {
+        const currentTime = audioCtx.currentTime;
+        scheduleNote(currentStep, currentTime);
+        currentStep++;
+        setTimeout(scheduler, (nextNote() - currentTime) * 1000);
     }
-    schedulerTimerId = requestAnimationFrame(scheduler);
 }
-
-let nextNoteTime = 0;
 
 function startPlaying() {
     if (!isPlaying) {
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => {
-                console.log('AudioContext resumed successfully');
-            });
-        }
         isPlaying = true;
         currentStep = 0;
-        nextNoteTime = audioCtx.currentTime;
         scheduler();
         document.getElementById('play').style.display = 'none';
         document.getElementById('stop').style.display = 'inline-block';
@@ -182,8 +181,6 @@ function startPlaying() {
 function stopPlaying() {
     if (isPlaying) {
         isPlaying = false;
-        cancelAnimationFrame(schedulerTimerId);
-        currentStep = 0;
         stepIndicators.forEach(indicator => indicator.classList.remove('active'));
         document.getElementById('play').style.display = 'inline-block';
         document.getElementById('stop').style.display = 'none';
@@ -197,35 +194,34 @@ function handlePatternImport(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
-        const contents = e.target.result;
-        const pattern = JSON.parse(contents);
-        loadPattern(pattern);
+    reader.onload = async function(e) {
+        try {
+            const contents = e.target.result;
+            const pattern = JSON.parse(contents);
+            await loadSounds(); // Ensure sounds are loaded before setting pattern
+            loadPattern(pattern);
+        } catch (error) {
+            console.error("Error reading the file:", error);
+            alert("Failed to import the pattern.");
+        }
     };
     reader.readAsText(file);
 }
 
+// Functie om het patroon te importeren vanuit een JSON-bestand
 function loadPattern(pattern) {
     steps.forEach(step => step.classList.remove('active'));
-    pattern.forEach((row, rowIndex) => {
-        row.forEach((cell, cellIndex) => {
-            if (cell) {
-                const step = document.querySelector(`.drum-row[data-row="${rowIndex + 1}"] .grid-cell[data-step="${cellIndex + 1}"]`);
-                step.classList.add('active');
-            }
-        });
+
+    pattern.forEach(item => {
+        const step = document.querySelector(`.drum-row[data-sound="${item.sound}"] .grid-cell[data-step="${item.step}"]`);
+        if (step) {
+            step.classList.add('active');
+        }
     });
 }
 
 // Event listeners for import inputs
-document.getElementById('importInput1').addEventListener('change', handlePatternImport);
-document.getElementById('importInput2').addEventListener('change', handlePatternImport);
-document.getElementById('importInput3').addEventListener('change', handlePatternImport);
-document.getElementById('importInput4').addEventListener('change', handlePatternImport);
-document.getElementById('importInput5').addEventListener('change', handlePatternImport);
-document.getElementById('importInput6').addEventListener('change', handlePatternImport);
-document.getElementById('importInput7').addEventListener('change', handlePatternImport);
-document.getElementById('importInput8').addEventListener('change', handlePatternImport);
+document.getElementById('importInput').addEventListener('change', handlePatternImport);
 
 // Event listeners for the buttons
 document.getElementById('play').addEventListener('click', startPlaying);
@@ -243,3 +239,35 @@ bpmInput.addEventListener('input', () => {
         startPlaying();
     }
 });
+
+// Listen for changes to the swing input
+swingInput.addEventListener('input', () => {
+    if (isPlaying) {
+        stopPlaying();
+        startPlaying();
+    }
+});
+
+// Functie om het patroon te exporteren naar een JSON-bestand
+function exportPattern() {
+    const pattern = [];
+
+    steps.forEach(step => {
+        if (step.classList.contains('active')) {
+            pattern.push({
+                step: step.dataset.step,
+                sound: step.closest('.drum-row').dataset.sound
+            });
+        }
+    });
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pattern));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "pattern.json");
+    document.body.appendChild(downloadAnchorNode); // required for Firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+document.getElementById('exportButton').addEventListener('click', exportPattern);
