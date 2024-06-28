@@ -44,6 +44,7 @@ let currentStep = 0;
 let isPlaying = false;
 let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
+const steps = document.querySelectorAll('.grid-cell');
 const stepIndicators = document.querySelectorAll('.step');
 const swingInput = document.getElementById('swing');
 let swingAmount = swingInput ? swingInput.value / 100 : 0;
@@ -244,3 +245,69 @@ soundKitSelect.addEventListener('change', () => {
     loadButton.textContent = 'Load 3';
     sounds = {};
 });
+
+steps.forEach(step => {
+    step.addEventListener('click', () => {
+        step.classList.toggle('active');
+    });
+});
+
+bpmInput.addEventListener('input', () => {
+    if (isPlaying) {
+        stopPlayback();
+        startPlayback();
+    }
+});
+
+let songPatterns = [];
+
+function exportPattern() {
+    const pattern = [];
+    steps.forEach(step => {
+        if (step.classList.contains('active')) {
+            pattern.push({
+                step: step.dataset.step,
+                sound: step.closest('.drum-row').dataset.sound
+            });
+        }
+    });
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pattern));
+    const downloadAnchorNode = document.getElementById('downloadLink');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "pattern.json");
+    downloadAnchorNode.click();
+}
+
+document.getElementById('exportButton').addEventListener('click', exportPattern);
+
+function readJSONFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(JSON.parse(event.target.result));
+        reader.onerror = (error) => reject(error);
+        reader.readAsText(file);
+    });
+}
+
+async function importPattern(event) {
+    const file = document.getElementById('importInput').files[0];
+    if (!file) {
+        alert("Please select a file to import.");
+        return;
+    }
+    try {
+        const pattern = await readJSONFile(file);
+        steps.forEach(step => step.classList.remove('active'));
+        pattern.forEach(item => {
+            const step = document.querySelector(`.drum-row[data-sound="${item.sound}"] .grid-cell[data-step="${item.step}"]`);
+            if (step) {
+                step.classList.add('active');
+            }
+        });
+    } catch (error) {
+        console.error("Error reading the file:", error);
+        alert("Failed to import the pattern.");
+    }
+}
+
+document.getElementById('importButton').addEventListener('click', importPattern);
