@@ -150,11 +150,6 @@ footer {
     flex-direction: column;
 }
 
-.downloadLink {
-    background-color: #FFBB00;
-    color: #333;
-}
-
 .controls button,
 .controls input {
     display: flex;
