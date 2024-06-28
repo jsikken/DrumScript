@@ -91,6 +91,32 @@ footer {
   box-shadow: inset 0px -5px 5px 0px rgba(0,0,0,0.75), 0px -5px 5px 0px rgba(0,0,0,0.35);
 }
 
+#pattern-controls {
+    margin-top: 20px;
+}
+
+#pattern-controls label {
+    display: block;
+    margin-top: 10px;
+}
+
+#pattern-import {
+    margin-top: 20px;
+}
+
+#pattern-import input {
+    display: block;
+    margin-top: 5px;
+}
+
+#sequencer {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+
 #menu-toggle:checked ~ .menu-items {
   display: block;
 }
