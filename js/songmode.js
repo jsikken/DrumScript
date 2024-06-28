@@ -133,26 +133,29 @@ function playSoundByKey(key, time) {
 
 function scheduleNoteForPattern(pattern, stepIndex, time) {
     pattern.forEach(item => {
-        if (item.step == stepIndex) {
+        if (item.step == stepIndex + 1) { // Aangepast om te beginnen bij stap 1
             playSoundByKey(item.sound, time);
         }
     });
 }
 
+function nextNote() {
+    const secondsPerBeat = 60.0 / parseFloat(bpmInput.value);
+    nextNoteTime += 0.25 * secondsPerBeat;
+
+    currentStep++;
+    if (currentStep === 32) { // Aangepast naar 32 stappen (8 maten van 4 beats)
+        currentStep = 0;
+    }
+}
+
 function scheduler() {
     while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        songPatterns.forEach((pattern, index) => {
-            const adjustedStep = (currentStep + index) % 8;
-            scheduleNoteForPattern(pattern, adjustedStep, nextNoteTime);
+        songPatterns.forEach((pattern) => {
+            scheduleNoteForPattern(pattern, currentStep % 8, nextNoteTime);
         });
         
-        const secondsPerBeat = 60.0 / parseFloat(bpmInput.value);
-        nextNoteTime += 0.25 * secondsPerBeat * (currentStep % 2 === 1 ? (1.0 + swingAmount) : (1.0 - swingAmount));
-        currentStep++;
-        
-        if (currentStep >= 8) {
-            currentStep = 0;
-        }
+        nextNote();
     }
     
     schedulerTimerId = setTimeout(scheduler, lookahead);
