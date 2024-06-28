@@ -1,3 +1,4 @@
+// Define sound file paths and volumes
 const soundFiles = {
     '1': './kit1/kickwav.m4a',
     '2': './kit1/snarewav.m4a',
@@ -30,39 +31,29 @@ const soundVolumes = {
     '13': 0.1  // Dummy file volume set to 0
 };
 
+// Initialize AudioContext
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)({
     latencyHint: 'interactive'
 });
 
+// Variables for sequencing and playback
 let currentStep = 0;
 let isPlaying = false;
-let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
 const swingInput = document.getElementById('swing');
 const steps = document.querySelectorAll('.grid-cell');
 const stepIndicators = document.querySelectorAll('.step');
 const sounds = {};
-let clickCount = 0;
 let patterns = [];
 
+// Function to load sound from URL
 async function loadSound(url) {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     return audioCtx.decodeAudioData(arrayBuffer);
 }
 
-document.getElementById('loadButton').addEventListener('click', () => {
-    clickCount++;
-
-    // Assuming each input is responsible for loading one pattern
-    for (let i = 1; i <= 8; i++) {
-        const input = document.getElementById(`importInput${i}`);
-        input.removeEventListener('change', handlePatternImport); // Clear previous event listeners
-        input.addEventListener('change', handlePatternImport);
-        input.click(); // Trigger click to select file
-    }
-});
-
+// Load sounds from soundFiles object
 async function loadSounds() {
     try {
         const promises = [];
@@ -79,6 +70,7 @@ async function loadSounds() {
     }
 }
 
+// Function to play a sound buffer at specified time and volume
 function playSound(buffer, time, volume) {
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
@@ -89,6 +81,7 @@ function playSound(buffer, time, volume) {
     console.log(`Playing sound at time ${time}, volume ${volume}`);
 }
 
+// Function to play the dummy sound (if needed)
 function playDummySound() {
     if (sounds['13']) {
         const volume = soundVolumes['13'];
@@ -98,9 +91,10 @@ function playDummySound() {
     }
 }
 
-// Hihat choking logic
+// Hihat choking logic (if applicable)
 let activeHihatOpenSource = null;
 
+// Function to play sound by key at specified time
 function playSoundByKey(key, time) {
     if (key === '3' && activeHihatOpenSource) {
         activeHihatOpenSource.stop();
@@ -124,6 +118,7 @@ function playSoundByKey(key, time) {
     console.log(`Playing sound ${key} at time ${time}, volume ${gainNode.gain.value}`);
 }
 
+// Function to schedule a note at given step index and time
 function scheduleNote(stepIndex, time) {
     stepIndicators.forEach(indicator => indicator.classList.remove('active'));
     stepIndicators[stepIndex].classList.add('active');
@@ -140,19 +135,20 @@ function scheduleNote(stepIndex, time) {
     });
 }
 
+// Function to calculate next note time, considering BPM and swing
 function nextNote() {
     const secondsPerBeat = 60.0 / bpmInput.value;
     let swingOffset = 0;
 
     // Calculate swing offset for every second step with randomization
     if (currentStep % 2 !== 0 && swingInput.value > 0) {
-        // Generate a random number between -0.5 and 0.5, then scale by swingAmount and secondsPerBeat
         swingOffset = (Math.random() - 0.5) * swingInput.value * 0.01 * secondsPerBeat;
     }
 
     return audioCtx.currentTime + (0.5 * secondsPerBeat + swingOffset);
 }
 
+// Function to schedule notes in a sequence
 function scheduler() {
     while (isPlaying && currentStep < 8) {
         const currentTime = audioCtx.currentTime;
@@ -162,30 +158,48 @@ function scheduler() {
     }
 }
 
+// Function to start playback
 function startPlaying() {
     if (!isPlaying) {
         isPlaying = true;
         currentStep = 0;
         scheduler();
-        document.getElementById('play').style.display = 'none';
-        document.getElementById('pause').style.display = 'inline-block'; // Show pause button
-        document.getElementById('stop').style.display = 'inline-block';
         console.log('Playback started');
     }
 }
 
+// Function to stop playback
 function stopPlaying() {
     if (isPlaying) {
         isPlaying = false;
         stepIndicators.forEach(indicator => indicator.classList.remove('active'));
-        document.getElementById('play').style.display = 'inline-block';
-        document.getElementById('pause').style.display = 'none'; // Hide pause button
-        document.getElementById('stop').style.display = 'none';
         console.log('Playback stopped');
     }
 }
 
-// Function to handle pattern import
+// Event listener for play button
+document.getElementById('play').addEventListener('click', startPlaying);
+
+// Event listener for stop button
+document.getElementById('stop').addEventListener('click', stopPlaying);
+
+// Event listener for BPM input change
+bpmInput.addEventListener('input', () => {
+    if (isPlaying) {
+        stopPlaying();
+        startPlaying();
+    }
+});
+
+// Event listener for swing input change
+swingInput.addEventListener('input', () => {
+    if (isPlaying) {
+        stopPlaying();
+        startPlaying();
+    }
+});
+
+// Function to handle pattern import from file
 function handlePatternImport(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -195,11 +209,9 @@ function handlePatternImport(event) {
         try {
             const contents = e.target.result;
             const pattern = JSON.parse(contents);
-            patterns.push(pattern); // Add loaded pattern to patterns array
+            patterns.push(pattern);
             console.log(`Pattern loaded:`, pattern);
-            await loadSounds(); // Ensure sounds are loaded before setting pattern
-            // Optionally, you can load the pattern immediately upon import
-            // loadPattern(pattern);
+            await loadSounds();
         } catch (error) {
             console.error("Error reading the file:", error);
             alert("Failed to import the pattern.");
@@ -208,33 +220,13 @@ function handlePatternImport(event) {
     reader.readAsText(file);
 }
 
-// Event listeners for the buttons
-document.getElementById('play').addEventListener('click', startPlaying);
-document.getElementById('pause').addEventListener('click', stopPlaying); // added event listener for pause button
-document.getElementById('stop').addEventListener('click', stopPlaying);
+// Event listeners for pattern import inputs
+for (let i = 1; i <= 8; i++) {
+    const input = document.getElementById(`importInput${i}`);
+    input.addEventListener('change', handlePatternImport);
+}
 
-steps.forEach(step => {
-    step.addEventListener('click', () => {
-        step.classList.toggle('active');
-    });
-});
-
-bpmInput.addEventListener('input', () => {
-    if (isPlaying) {
-        stopPlaying();
-        startPlaying();
-    }
-});
-
-// Listen for changes to the swing input
-swingInput.addEventListener('input', () => {
-    if (isPlaying) {
-        stopPlaying();
-        startPlaying();
-    }
-});
-
-// Functie om het patroon te exporteren naar een JSON-bestand
+// Function to export pattern to JSON file
 function exportPattern() {
     const pattern = [];
 
@@ -256,4 +248,12 @@ function exportPattern() {
     downloadAnchorNode.remove();
 }
 
+// Event listener for export button
 document.getElementById('exportButton').addEventListener('click', exportPattern);
+
+// Function to toggle step activation
+steps.forEach(step => {
+    step.addEventListener('click', () => {
+        step.classList.toggle('active');
+    });
+});
