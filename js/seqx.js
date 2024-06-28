@@ -309,12 +309,14 @@ loadButton.addEventListener('click', () => {
     playDummySound();
     if (clickCount < 3) {
       loadButton.textContent = `Load ${3 - clickCount}`;
+      loadSounds();
     } else {
       loadButton.textContent = 'Done';
       loadButton.disabled = true;
       loadButton.style.display = 'none';
       document.getElementById('play').style.display = 'inline-block';
       document.getElementById('stop').style.display = 'inline-block';
+      loadSounds();
     }
   }
 });
