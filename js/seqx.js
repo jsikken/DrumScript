@@ -15,19 +15,19 @@ const soundFilesKit1 = {
 };
 
 const soundFilesKit2 = {
-    '1': './kit5/kd.wav',
-    '2': './kit5/sd.wav',
-    '3': './kit5/hhc.wav',
-    '4': './kit5/hho.wav',
-    '5': './kit5/t1.wav',
-    '6': './kit5/t2.wav',
-    '7': './kit5/crash.wav',
-    '8': './kit5/ride.wav',
-    '9': './kit5/clap.wav',
-    '10': './kit1/china.m4a',
-    '11': './kit1/gunshotwav.m4a',
-    '12': './kit1/stick.m4a',
-    '13': 'dummy.m4a'  // Dummy file
+    '1': './kit2/kickwav.m4a',
+    '2': './kit2/snarewav.m4a',
+    '3': './kit2/hihatclosedwav.m4a',
+    '4': './kit2/hihatopenwav.m4a',
+    '5': './kit2/midtomwav.m4a',
+    '6': './kit2/hitomwav.m4a',
+    '7': './kit2/crashwav.m4a',
+    '8': './kit2/ride.m4a',
+    '9': './kit2/clapwav.m4a',
+    '10': './kit2/china.m4a',
+    '11': './kit2/gunshotwav.m4a',
+    '12': './kit2/stick.m4a',
+    '13': 'dummy.m4a'
 };
 
 const soundVolumes = {
