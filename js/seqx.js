@@ -297,22 +297,55 @@ async function importPattern(event) {
 
 document.getElementById('importInput').addEventListener('change', importPattern);
 
-loadButton.addEventListener('click', () => {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+document.addEventListener('DOMContentLoaded', () => {
+  const loadButton = document.getElementById('loadButton');
+  if (loadButton) {
+    loadButton.addEventListener('click', () => {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      clickCount++;
+      if (clickCount <= 3) {
+        loadSounds();
+        playDummySound();
+        if (clickCount < 3) {
+          loadButton.textContent = `Load ${3 - clickCount}`;
+        } else {
+          loadButton.textContent = 'Done';
+          loadButton.disabled = true;
+          loadButton.style.display = 'none';
+          document.getElementById('play').style.display = 'inline-block';
+          document.getElementById('stop').style.display = 'inline-block';
+        }
+      }
+    });
   }
-  clickCount++;
-  if (clickCount <= 3) {
-    loadSounds();
-    playDummySound();
-    if (clickCount < 3) {
-      loadButton.textContent = `Load ${3 - clickCount}`;
-    } else {
-      loadButton.textContent = 'Done';
-      loadButton.disabled = true;
-      loadButton.style.display = 'none';
-      document.getElementById('play').style.display = 'inline-block';
-      document.getElementById('stop').style.display = 'inline-block';
-    }
+
+  const playButton = document.getElementById('play');
+  if (playButton) {
+    playButton.addEventListener('click', () => {
+      if (!isPlaying) {
+        startPlayback();
+      }
+    });
+  }
+
+  const stopButton = document.getElementById('stop');
+  if (stopButton) {
+    stopButton.addEventListener('click', () => {
+      if (isPlaying) {
+        stopPlayback();
+      }
+    });
+  }
+
+  const exportButton = document.getElementById('exportButton');
+  if (exportButton) {
+    exportButton.addEventListener('click', exportPattern);
+  }
+
+  const importInput = document.getElementById('importInput');
+  if (importInput) {
+    importInput.addEventListener('change', importPattern);
   }
 });
