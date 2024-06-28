@@ -15,40 +15,40 @@
         .button {
             display: inline-block; /* Verandert de knop in een inline-blok element */
         }
-        
     </style>
 </head>
 <body>
-    
-    <footer><div class="container">
-        <nav class="mobile-menu">
-            <input type="checkbox" id="menu-toggle">
-            <label for="menu-toggle" class="menu-icon">&#9776;</label>
-            <ul class="menu-items">
-                <li><a href="./index.html">refresh</a></li>
-                <li class="dropdown">
-                    <button class="dropbtn">drumpads</button>
-                    <div class="dropdown-content">
-                      <a href="#" onclick="chooseKit('kit5.js')">kit 5</a>
-                      <a href="#" onclick="chooseKit('kit4.js')">kit 4</a>
-                      <a href="#" onclick="chooseKit('kit3.js')">kit 3</a>
-                      <a href="#" onclick="chooseKit('kit2.js')">kit 2</a>
-                      <a href="#" onclick="chooseKit('kit1.js')">kit 1</a>
+    <footer>
+        <div class="container">
+            <nav class="mobile-menu">
+                <input type="checkbox" id="menu-toggle">
+                <label for="menu-toggle" class="menu-icon">&#9776;</label>
+                <ul class="menu-items">
+                    <li><a href="./index.html">refresh</a></li>
+                    <li class="dropdown">
+                        <button class="dropbtn">drumpads</button>
+                        <div class="dropdown-content">
+                            <a href="#" onclick="chooseKit('kit5.js'); return false;">kit 5</a>
+                            <a href="#" onclick="chooseKit('kit4.js'); return false;">kit 4</a>
+                            <a href="#" onclick="chooseKit('kit3.js'); return false;">kit 3</a>
+                            <a href="#" onclick="chooseKit('kit2.js'); return false;">kit 2</a>
+                            <a href="#" onclick="chooseKit('kit1.js'); return false;">kit 1</a>
+                        </div>
+                    </li>
+                    <div class="dropdown">
+                        <button class="dropbtn">sequencers</button>
+                        <div class="dropdown-content">
+                            <li><a href="seq2.html">seq 2</a></li>
+                            <li><a href="seqx.html">beta</a></li>
+                            <li><a href="seq.html">seq</a></li>
+                            <li><a href="songmode.html">song mode</a></li>
+                        </div>
                     </div>
-                </li>
-              <div class="dropdown">
-                    <button class="dropbtn">sequencers</button>
-                    <div class="dropdown-content">
-                      <li><a href="seq2.html">seq 2</a></li>
-                      <li><a href="seqx.html">beta</a></li>
-                      <li><a href="seq.html">seq</a></li>
-                      <li><a href="songmode.html">song mode</a></li>
-                    </div>
-                  </div>
-            </ul>
-          </nav>
-        <p>DrumScript © Joppe Sikken, 2024.</p>
-    </div></footer>
+                </ul>
+            </nav>
+            <p>DrumScript © Joppe Sikken, 2024.</p>
+        </div>
+    </footer>
     <div id="drum-kit2">
         <div class="key" data-key="3"><span>Hi-Hat-Closed</span><audio id="hihatclosed" src="kit1/hihatclosedwav.m4a" preload="auto" data-key="3"></audio></div>
         <div class="key" data-key="4"><span>Hi-Hat-Open</span><audio id="hihatopen" src="kit1/hihatopenwav.m4a" preload="auto" data-key="4"></audio></div>
@@ -64,36 +64,62 @@
     </div>
     <script src="js/kit1.js" id="kit-script"></script>
     <script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
-        .then(function(registration) {
-            console.log('Service Worker registered with scope:', registration.scope);
-        }).catch(function(error) {
-            console.log('Service Worker registration failed:', error);
-        });
-    }
-</script>
-<script>
-    function addToHomeScreen() {
-      // Controleer of het apparaat iOS is en niet in standalone modus
-      if ('navigator' in window && 'standalone' in window.navigator && !window.navigator.standalone) {
-        alert('Druk op het deel-icoon en selecteer "Zet op beginscherm".');
-      } 
-      // Controleer of het apparaat Android is en in browser modus
-      else if ('matchMedia' in window && window.matchMedia('(display-mode: browser)').matches) {
-        alert('Druk op het menu-icoon en selecteer "Toevoegen aan startscherm".');
-      } 
-      // Als het apparaat geen ondersteuning heeft
-      else {
-        alert('Uw apparaat ondersteunt deze functie niet.');
-      }
-    }
-</script>
-<script>
-    function chooseKit(scriptSrc) {
-    var scriptElement = document.getElementById('kit-script');
-    scriptElement.src = scriptSrc;
-    }
-</script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+            .then(function(registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(function(error) {
+                console.log('Service Worker registration failed:', error);
+            });
+        }
+
+        function addToHomeScreen() {
+            if ('navigator' in window && 'standalone' in window.navigator && !window.navigator.standalone) {
+                alert('Druk op het deel-icoon en selecteer "Zet op beginscherm".');
+            } else if ('matchMedia' in window && window.matchMedia('(display-mode: browser)').matches) {
+                alert('Druk op het menu-icoon en selecteer "Toevoegen aan startscherm".');
+            } else {
+                alert('Uw apparaat ondersteunt deze functie niet.');
+            }
+        }
+
+        function checkOrientation() {
+            if (window.innerHeight < window.innerWidth) {
+                document.getElementById('landscape-warning').style.display = 'flex';
+                document.getElementById('content').style.display = 'none';
+            } else {
+                document.getElementById('landscape-warning').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            }
+        }
+
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('load', checkOrientation);
+
+        function chooseKit(scriptSrc) {
+            var oldScript = document.getElementById('kit-script');
+            if (oldScript) {
+                oldScript.remove();
+            }
+
+            var newScript = document.createElement('script');
+            newScript.id = 'kit-script';
+            newScript.src = 'js/' + scriptSrc; // Voeg het juiste pad toe
+            document.body.appendChild(newScript);
+
+            // Update de audio bronnen
+            updateAudioSources(scriptSrc.replace('.js', ''));
+        }
+
+        function updateAudioSources(kitName) {
+            var audioElements = document.getElementsByTagName('audio');
+            for (var i = 0; i < audioElements.length; i++) {
+                var audio = audioElements[i];
+                var oldSrc = audio.src;
+                var newSrc = oldSrc.replace(/kit\d+/, kitName);
+                audio.src = newSrc;
+            }
+        }
+    </script>
 </body>
 </html>
