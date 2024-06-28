@@ -192,33 +192,27 @@ function stopPlaying() {
     }
 }
 
-// Function to handle pattern import
-function handlePatternImport(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const contents = e.target.result;
-            const pattern = JSON.parse(contents);
-            patterns.push(pattern); // Add loaded pattern to patterns array
-            console.log(`Pattern loaded:`, pattern);
-            await loadSounds(); // Ensure sounds are loaded before setting pattern
-            // Optionally, you can load the pattern immediately upon import
-            // loadPattern(pattern);
-        } catch (error) {
-            console.error("Error reading the file:", error);
-            alert("Failed to import the pattern.");
-        }
-    };
-    reader.readAsText(file);
-}
-
 // Event listeners for the buttons
-document.getElementById('play').addEventListener('click', startPlaying);
-document.getElementById('pause').addEventListener('click', stopPlaying); // added event listener for pause button
-document.getElementById('stop').addEventListener('click', stopPlaying);
+document.getElementById('play').addEventListener('click', () => {
+    startPlaying();
+    document.getElementById('play').style.display = 'none';
+    document.getElementById('pause').style.display = 'inline-block'; // Show pause button
+    document.getElementById('stop').style.display = 'inline-block';
+});
+
+document.getElementById('pause').addEventListener('click', () => {
+    stopPlaying();
+    document.getElementById('play').style.display = 'inline-block';
+    document.getElementById('pause').style.display = 'none'; // Hide pause button
+    document.getElementById('stop').style.display = 'none';
+});
+
+document.getElementById('stop').addEventListener('click', () => {
+    stopPlaying();
+    document.getElementById('play').style.display = 'inline-block';
+    document.getElementById('pause').style.display = 'none'; // Hide pause button
+    document.getElementById('stop').style.display = 'none';
+});
 
 steps.forEach(step => {
     step.addEventListener('click', () => {
