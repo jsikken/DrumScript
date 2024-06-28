@@ -242,6 +242,11 @@ async function importPattern(event) {
             alert('Failed to import the pattern');
         }
     };
+
+    reader.onerror = () => {
+        console.error('Error reading the file:', reader.error);
+        alert('Failed to import the pattern');
+    };
 }
 
 for (let i = 1; i <= 8; i++) {
