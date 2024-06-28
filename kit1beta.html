@@ -35,15 +35,15 @@
                             <a href="#" onclick="chooseKit('kit1.js'); return false;">kit 1</a>
                         </div>
                     </li>
-                    <div class="dropdown">
+                    <li class="dropdown">
                         <button class="dropbtn">sequencers</button>
                         <div class="dropdown-content">
-                            <li><a href="seq2.html">seq 2</a></li>
-                            <li><a href="seqx.html">beta</a></li>
-                            <li><a href="seq.html">seq</a></li>
-                            <li><a href="songmode.html">song mode</a></li>
+                            <a href="seq2.html">seq 2</a>
+                            <a href="seqx.html">beta</a>
+                            <a href="seq.html">seq</a>
+                            <a href="songmode.html">song mode</a>
                         </div>
-                    </div>
+                    </li>
                 </ul>
             </nav>
             <p>DrumScript © Joppe Sikken, 2024.</p>
@@ -66,11 +66,12 @@
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js')
-            .then(function(registration) {
-                console.log('Service Worker registered with scope:', registration.scope);
-            }).catch(function(error) {
-                console.log('Service Worker registration failed:', error);
-            });
+                .then(function(registration) {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('Service Worker registration failed:', error);
+                });
         }
 
         function addToHomeScreen() {
@@ -86,7 +87,7 @@
         function chooseKit(scriptSrc) {
             var oldScript = document.getElementById('kit-script');
             if (oldScript) {
-                oldScript.remove();
+                oldScript.parentNode.removeChild(oldScript); // Verwijder het oude script element
             }
             
             var newScript = document.createElement('script');
@@ -112,19 +113,19 @@
 
         function removeEventListeners() {
             // Implementeer hier de logica om event listeners te verwijderen
-            // Bijvoorbeeld:
             var drumPads = document.querySelectorAll('.key');
             drumPads.forEach(function(pad) {
-                pad.replaceWith(pad.cloneNode(true));
+                pad.removeEventListener('click', playSound); // Verwijder de event listener
             });
+            window.removeEventListener('keydown', handleKeydown); // Verwijder de keydown event listener
         }
 
         function initializeDrumKit() {
             // Implementeer hier de logica om de drumkit te initialiseren
-            // Bijvoorbeeld:
             var drumPads = document.querySelectorAll('.key');
             drumPads.forEach(function(pad) {
-                pad.addEventListener('click', playSound);
+                pad.addEventListener('click', playSound); // Voeg de event listener opnieuw toe
+                pad.addEventListener('touchstart', playSound, { passive: false });
             });
 
             // Voeg event listeners toe voor toetsenbordgebeurtenissen
