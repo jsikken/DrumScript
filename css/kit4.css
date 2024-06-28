@@ -112,7 +112,7 @@ header h4 {
 }
 
 .dropdown-content a:hover {
-  background-color: #ddd;
+  background-color: transparent;
 }
 
 .dropdown:hover .dropdown-content {
