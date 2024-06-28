@@ -46,11 +46,11 @@ let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
 const stepIndicators = document.querySelectorAll('.step');
 const swingInput = document.getElementById('swing');
-let swingAmount = swingInput.value / 100;
+let swingAmount = swingInput ? swingInput.value / 100 : 0;
 const sounds = {};
 let soundFiles = soundFilesKit1; // Default to Kit 1
 
-let loadButton = document.getElementById('loadButton');
+const loadButton = document.getElementById('loadButton');
 let clickCount = 0;
 
 const lookahead = 25.0;
@@ -228,68 +228,19 @@ function createRepetitionInput(patternIndex) {
         <input type="number" id="pattern-${patternIndex}-repetitions" min="1" value="1">
     `;
     container.appendChild(inputDiv);
-
-    const input = inputDiv.querySelector('input');
-    input.addEventListener('change', () => {
-        patternRepetitions[patternIndex] = parseInt(input.value);
-    });
 }
 
-async function importPattern(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.readAsText(file);
-
-    reader.onload = () => {
-        try {
-            const pattern = JSON.parse(reader.result);
-            songPatterns.push(pattern);
-            
-            const patternIndex = songPatterns.length - 1;
-            createRepetitionInput(patternIndex);
-            patternRepetitions[patternIndex] = 1;
-            
-            alert('Pattern imported successfully');
-        } catch (error) {
-            console.error('Error reading the file:', error);
-            alert('Failed to import the pattern');
-        }
-    };
-
-    reader.onerror = () => {
-        console.error('Error reading the file:', reader.error);
-        alert('Failed to import the pattern');
-    };
-
-    reader.readAsText(file);
-}
-
-for (let i = 1; i <= 8; i++) {
-    document.getElementById(`importInput${i}`).addEventListener('change', importPattern);
-}
-
-swingInput.addEventListener('input', (event) => {
-    swingAmount = event.target.value / 100;
+swingInput.addEventListener('input', () => {
+    swingAmount = swingInput.value / 100;
 });
 
-bpmInput.addEventListener('input', () => {
-    if (isPlaying) {
-        clearTimeout(schedulerTimerId);
-        scheduler();
-    }
-});
-
-function selectSoundKit(kit) {
-    if (kit === 'kit1') {
-        soundFiles = soundFilesKit1;
-    } else if (kit === 'kit2') {
-        soundFiles = soundFilesKit2;
-    }
+const soundKitSelect = document.getElementById('soundKit');
+soundKitSelect.addEventListener('change', () => {
+    const selectedKit = soundKitSelect.value;
+    soundFiles = selectedKit === 'kit2' ? soundFilesKit2 : soundFilesKit1;
     loadButton.disabled = false;
-    loadButton.textContent = 'Load 3';
+    loadButton.style.display = 'inline-block';
     clickCount = 0;
-    console.log(`Selected ${kit}`);
-    loadSounds(); // Load the sounds of the selected kit
-}
+    loadButton.textContent = 'Load 3';
+    sounds = {};
+});
