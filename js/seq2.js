@@ -40,7 +40,10 @@ let schedulerTimerId;
 const bpmInput = document.getElementById('bpm');
 const steps = document.querySelectorAll('.grid-cell');
 const stepIndicators = document.querySelectorAll('.step');
+const swingInput = document.getElementById('swing');
+let swingAmount = swingInput.value / 100; // Initialize swing amount
 const sounds = {};
+
 let loadButton = document.getElementById('loadButton');
 let clickCount = 0;
 
@@ -59,7 +62,7 @@ loadButton.addEventListener('click', () => {
     
     if (clickCount === 1 || clickCount === 2 || clickCount === 3) {
         loadSounds();
-        playDummySound()
+        playDummySound();
     }
     
     if (clickCount < 3) {
@@ -145,7 +148,15 @@ function scheduleNote(stepIndex, time) {
 
 function nextNote() {
     const secondsPerBeat = 60.0 / bpmInput.value;
-    nextNoteTime += 0.5 * secondsPerBeat; // Add half a beat
+    let swingOffset = 0;
+
+    // Calculate swing offset for every second step with randomization
+    if (currentStep % 2 !== 0 && swingAmount > 0) {
+        // Generate a random number between -0.5 and 0.5, then scale by swingAmount and secondsPerBeat
+        swingOffset = (Math.random() - 0.5) * swingAmount * 0.5 * secondsPerBeat;
+    }
+
+    nextNoteTime += 0.5 * secondsPerBeat + swingOffset; // Apply swing offset
     currentStep++;
     if (currentStep === 8) {
         currentStep = 0;
@@ -202,7 +213,10 @@ bpmInput.addEventListener('input', () => {
     }
 });
 
-
+// Listen for changes to the swing input
+swingInput.addEventListener('input', () => {
+    swingAmount = swingInput.value / 100;
+});
 
 // Functie om het patroon te exporteren naar een JSON-bestand
 function exportPattern() {
