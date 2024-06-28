@@ -174,7 +174,7 @@ footer {
     touch-action: none;
 }
 
-.dropbtn, .dropbtn2 {
+.dropbtn {
   background-color: transparent;
   color: #FFBB00;
   padding: 16px;
@@ -182,7 +182,7 @@ footer {
   border: none;
 }
 
-.dropdown {
+.dropdown, .dropdownseq {
   position: relative;
   display: inline-block;
 }
